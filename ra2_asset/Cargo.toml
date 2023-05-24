@@ -1,0 +1,17 @@
+[package]
+name = "ra2_asset"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bevy = { version = "0.10.1", features = ["dynamic_linking"] }
+serde = "1.0.162"
+serde_json = "1.0.96"
+base64 = "0.21.0"
+anyhow = "1.0.71"
+ra2_data = { path = "../ra2_data"}
+ra2_util = { path = "../ra2_util"}
+#thiserror = "1.0.40"
+configparser = "3.0.2"

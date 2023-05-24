@@ -1,0 +1,12 @@
+[package]
+name = "ra2_resource"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ra2_asset = {path = "../ra2_asset"}
+ra2_data = { path = "../ra2_data"}
+ra2_util = { path = "../ra2_util"}
+

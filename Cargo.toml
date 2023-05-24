@@ -1,10 +1,12 @@
-[package]
-name = "rust-lib"
-version = "0.1.0"
-edition = "2021"
+[workspace]
+members = ["ra2_asset", "ra2_util", "ra2_data", "ra2_resource"]
+resolver = "2" # Important! wgpu/Bevy needs this!
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
-log = "0.4.17"
-custom-utils = "0.10.14"
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
