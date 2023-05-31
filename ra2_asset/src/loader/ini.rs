@@ -10,6 +10,7 @@ use serde_json::Value;
 /// 生成IniFile资产
 #[derive(Default)]
 pub struct IniFileAssetLoader;
+
 impl AssetLoader for IniFileAssetLoader {
     fn load<'b>(
         &'b self,
@@ -24,15 +25,10 @@ impl AssetLoader for IniFileAssetLoader {
     }
 }
 
-async fn load<'b>(
-    bytes: &[u8],
-    load_context: &mut LoadContext<'b>
-) -> Result<()> {
+async fn load<'b>(bytes: &[u8], load_context: &mut LoadContext<'b>) -> Result<()> {
     let name = get_file_name(&load_context)?;
     let val: Value = serde_json::from_slice(bytes)?;
     debug!("IniFileAssetLoaderFile {} loading", name);
-    load_context.set_default_asset(LoadedAsset::new(IniFile::new(
-        name, val, None
-    )?));
+    load_context.set_default_asset(LoadedAsset::new(IniFile::new(name, val, None)?));
     Ok(())
 }

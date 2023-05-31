@@ -1,5 +1,5 @@
 # https://rust-lang.github.io/rustfmt/?version=v2.0.0-rc.2&search=#ignore
-max_width = 70
+max_width = 100
 edition = "2021"
 use_field_init_shorthand = true
 use_try_shorthand = true

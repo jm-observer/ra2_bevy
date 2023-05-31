@@ -1,3 +1,4 @@
+pub mod palette;
 use anyhow::{anyhow, Result};
 use bevy::asset::LoadContext;
 
