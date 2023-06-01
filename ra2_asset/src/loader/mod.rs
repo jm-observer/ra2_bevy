@@ -1,8 +1,12 @@
-pub mod palette;
+mod palette;
+mod ini;
+
+pub use palette::*;
+pub use ini::*;
+
 use anyhow::{anyhow, Result};
 use bevy::asset::LoadContext;
 
-mod ini;
 
 fn get_file_name(load_context: &LoadContext) -> Result<String> {
     Ok(load_context

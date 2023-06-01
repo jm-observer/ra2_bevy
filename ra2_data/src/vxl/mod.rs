@@ -14,75 +14,10 @@ pub struct SectionOrigin {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct VxlFileOrigin {
-    sections: Vec<SectionOrigin>
+    pub sections: Vec<SectionOrigin>
 }
 
-impl VxlFileOrigin {
-    pub fn deal(self, name: String) -> VxlFile {
-        let mut vxl = VxlFile {
-            name,
-            sections: Vec::with_capacity(self.sections.len())
-        };
-        self.sections.into_iter().for_each(|val| {
-            let SectionOrigin {
-                name,
-                hva_multiplier,
-                max_bounds,
-                min_bounds,
-                normals_mode,
-                size,
-                spans,
-                transf_matrix
-            } = val;
-
-            let max_bounds = Vec3::from(max_bounds);
-            let min_bounds = Vec3::from(min_bounds);
-            let [size_x, size_y, size_z] = size;
-            let [a0, a1, a2] = transf_matrix;
-            let cols: [[f32; 4]; 4] = [a0, a1, a2, [0f32; 4]];
-            Mat4::from_cols_array_2d(&cols);
-            let mut section = Section {
-                name,
-                hva_multiplier,
-                max_bounds,
-                min_bounds,
-                size_x,
-                size_y,
-                size_z,
-                normals_mode,
-                transf_matrix: Default::default(),
-                spans: Vec::with_capacity(spans.len())
-            };
-            spans.iter().for_each(|x| {
-                let r = x.split(" ").collect::<Vec<&str>>();
-                let r0 = r[0].parse::<i32>().unwrap();
-                let r1 = r[1].parse::<i32>().unwrap();
-                let mut n = Span {
-                    x:      r0,
-                    y:      r1,
-                    voxels: Vec::with_capacity(5)
-                };
-                if r.len() > 2 && r[2] != "" {
-                    let a = r[2].split(";").collect::<Vec<&str>>();
-                    a.iter().for_each(|y| {
-                        let o = y.split(",").collect::<Vec<&str>>();
-                        n.voxels.push(Voxel {
-                            x:            r0,
-                            y:            r1,
-                            z:            o[0].parse::<i32>().unwrap(),
-                            color_index:  o[1].parse::<i32>().unwrap(),
-                            normal_index: o[2].parse::<i32>().unwrap()
-                        })
-                    });
-                }
-                section.spans.push(n);
-            });
-            vxl.sections.push(section);
-        });
-        vxl
-    }
-}
-
+#[derive(Debug, Clone)]
 pub struct Section {
     pub name:           String,
     pub hva_multiplier: f32,
@@ -145,29 +80,20 @@ impl Section {
         }
     }
 }
-
+#[derive(Debug, Clone)]
 pub struct Span {
     pub x:      i32,
     pub y:      i32,
     pub voxels: Vec<Voxel>
 }
+
+#[derive(Debug, Clone)]
 pub struct Voxel {
     pub x:            i32,
     pub y:            i32,
     pub z:            i32,
     pub color_index:  i32,
     pub normal_index: i32
-}
-
-pub struct VxlFile {
-    pub name:     String,
-    pub sections: Vec<Section>
-}
-
-impl VxlFile {
-    pub fn get_section(&self, index: usize) -> &Section {
-        &self.sections[index]
-    }
 }
 
 const NORMALS_1: [[f32; 3]; 16] = [

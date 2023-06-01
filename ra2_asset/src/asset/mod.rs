@@ -1,5 +1,6 @@
 mod ini;
 mod palette;
+pub mod vxl;
 
 pub use ini::*;
 pub use palette::*;
