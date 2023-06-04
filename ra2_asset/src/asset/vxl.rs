@@ -46,8 +46,8 @@ impl VxlFile {
             };
             spans.iter().for_each(|x| {
                 let r = x.split(" ").collect::<Vec<&str>>();
-                let r0 = r[0].parse::<i32>().unwrap();
-                let r1 = r[1].parse::<i32>().unwrap();
+                let r0 = r[0].parse::<f32>().unwrap();
+                let r1 = r[1].parse::<f32>().unwrap();
                 let mut n = Span {
                     x:      r0,
                     y:      r1,
@@ -60,9 +60,9 @@ impl VxlFile {
                         n.voxels.push(Voxel {
                             x:            r0,
                             y:            r1,
-                            z:            o[0].parse::<i32>().unwrap(),
-                            color_index:  o[1].parse::<i32>().unwrap(),
-                            normal_index: o[2].parse::<i32>().unwrap()
+                            z:            o[0].parse::<f32>().unwrap(),
+                            color_index:  o[1].parse::<usize>().unwrap(),
+                            normal_index: o[2].parse::<usize>().unwrap()
                         })
                     });
                 }

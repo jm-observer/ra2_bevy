@@ -68,12 +68,12 @@ impl Section {
         res
     }
 
-    pub fn get_normals(&self) -> Vec<[f32; 3]> {
+    pub fn get_normals(&self) -> &'static [[f32; 3]] {
         match self.normals_mode {
-            1u32 => NORMALS_1.to_vec(),
-            2u32 => NORMALS_2.to_vec(),
-            3u32 => NORMALS_3.to_vec(),
-            4u32 => NORMALS_4.to_vec(),
+            1u32 => NORMALS_1.as_ref(),
+            2u32 => NORMALS_2.as_ref(),
+            3u32 => NORMALS_3.as_ref(),
+            4u32 => NORMALS_4.as_ref(),
             _ => {
                 panic!()
             }
@@ -82,18 +82,18 @@ impl Section {
 }
 #[derive(Debug, Clone)]
 pub struct Span {
-    pub x:      i32,
-    pub y:      i32,
+    pub x:      f32,
+    pub y:      f32,
     pub voxels: Vec<Voxel>
 }
 
 #[derive(Debug, Clone)]
 pub struct Voxel {
-    pub x:            i32,
-    pub y:            i32,
-    pub z:            i32,
-    pub color_index:  i32,
-    pub normal_index: i32
+    pub x:            f32,
+    pub y:            f32,
+    pub z:            f32,
+    pub color_index:  usize,
+    pub normal_index: usize
 }
 
 const NORMALS_1: [[f32; 3]; 16] = [

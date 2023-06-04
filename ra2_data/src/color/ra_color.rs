@@ -2,9 +2,9 @@ use crate::pub_use::*;
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, Hash, Resource)]
 pub struct RaColor {
-    r: u8,
-    g: u8,
-    b: u8
+    pub r: u8,
+    pub g: u8,
+    pub b: u8
 }
 
 const T: [f32; 16] = [

@@ -1,6 +1,9 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    render::{mesh::VertexAttributeValues, render_resource::PrimitiveTopology}
+};
 use ra2_asset::{
     asset::{Palette, VxlFile},
     loader::{PaletteLoader, VxlAssetLoader}
@@ -26,7 +29,11 @@ fn setup(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut assert_server: ResMut<AssetServer>
 ) {
-    let vxl = assert_server.load("vxl/1tnk.vxl");
+    // let vxl = assert_server.load("vxl/1tnk.vxl");
+    // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
+
+    let vxl = assert_server.load("vxl/1tnktur.vxl");
+
     let palette = assert_server.load("palettes/uniturb.pal");
 
     commands.insert_resource(CustomRes {
@@ -35,12 +42,6 @@ fn setup(
         printed: false
     });
 
-    commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
-        transform: Transform::from_xyz(0.0, 0.5, 0.0),
-        ..default()
-    });
     // light
     commands.spawn(PointLightBundle {
         point_light: PointLight {
@@ -59,9 +60,13 @@ fn setup(
 }
 
 fn print_on_load(
+    mut commands: Commands,
     mut state: ResMut<CustomRes>,
     vxl_assets: ResMut<Assets<VxlFile>>,
-    palette_assets: ResMut<Assets<Palette>>
+    palette_assets: ResMut<Assets<Palette>>,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut stdmats: ResMut<Assets<StandardMaterial>>,
+    mut assert_server: ResMut<AssetServer>
 ) {
     let vxl_asset = vxl_assets.get(&state.vxl);
     let palette_asset = palette_assets.get(&state.palette);
@@ -74,6 +79,48 @@ fn print_on_load(
     state.printed = true;
     info!("vxl asset loaded: {:?}", vxl);
     info!("palette asset loaded: {:?}", palette);
+
+    for section in &vxl.sections {
+        info!("scale {:?}", section.get_scale());
+        let normal = section.get_normals();
+
+        let mut positions = Vec::new();
+        let mut normals = Vec::new();
+        let mut colors = Vec::new();
+
+        let mut render_mesh = Mesh::new(PrimitiveTopology::PointList);
+
+        for vxl in section.get_all_voxels() {
+            let color = palette.colors.get(vxl.color_index).unwrap();
+            colors.push([color.r as f32, color.g as f32, color.b as f32, 1.0]);
+            positions.push([vxl.x, vxl.y, vxl.z]);
+            normals.push(normal.get(vxl.normal_index).unwrap().clone());
+        }
+        render_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_POSITION,
+            VertexAttributeValues::Float32x3(positions)
+        );
+
+        render_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_NORMAL,
+            VertexAttributeValues::Float32x3(normals)
+        );
+        render_mesh.insert_attribute(
+            Mesh::ATTRIBUTE_COLOR,
+            VertexAttributeValues::Float32x4(colors)
+        );
+
+        let handle = meshes.add(render_mesh);
+
+        commands.spawn(PbrBundle {
+            transform: Transform::from_scale((0.01, 0.01, 0.01).into()),
+            // transform: Transform::from_scale(section.get_scale()),
+            mesh: handle,
+            // mesh: assets.load("2x2x2.vox"),
+            material: stdmats.add(Color::rgb(0.3, 0.3, 0.3).into()),
+            ..Default::default()
+        });
+    }
 }
 
 #[derive(Resource)]
