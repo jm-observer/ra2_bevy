@@ -7,5 +7,6 @@ edition = "2021"
 
 [dependencies]
 ra2_asset = { path = "../ra2_asset"}
+ra2_data = { path = "../ra2_data"}
 anyhow = "1.0.71"
 bevy = { git = "https://github.com/bevyengine/bevy.git" , features = ["dynamic_linking"] }

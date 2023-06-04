@@ -8,6 +8,7 @@ use ra2_asset::{
     asset::{Palette, VxlFile},
     loader::{PaletteLoader, VxlAssetLoader}
 };
+use ra2_data::color::RaColor;
 
 fn main() {
     App::new()
@@ -32,7 +33,7 @@ fn setup(
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
 
-    let vxl = assert_server.load("vxl/1tnktur.vxl");
+    let vxl = assert_server.load("vxl/1tnk.vxl");
 
     let palette = assert_server.load("palettes/uniturb.pal");
 
@@ -63,19 +64,21 @@ fn print_on_load(
     mut commands: Commands,
     mut state: ResMut<CustomRes>,
     vxl_assets: ResMut<Assets<VxlFile>>,
-    palette_assets: ResMut<Assets<Palette>>,
+    mut palette_assets: ResMut<Assets<Palette>>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut stdmats: ResMut<Assets<StandardMaterial>>,
-    mut assert_server: ResMut<AssetServer>
+    mut stdmats: ResMut<Assets<StandardMaterial>>
 ) {
     let vxl_asset = vxl_assets.get(&state.vxl);
-    let palette_asset = palette_assets.get(&state.palette);
+    let palette_asset = palette_assets.get_mut(&state.palette);
     if state.printed {
         return;
     }
     let (Some(vxl), Some(palette)) = (vxl_asset, palette_asset) else {
         return;
     };
+    //     "Green": "104,241,195",
+    let player_color = RaColor::new(104, 241, 195);
+    palette.remap(&player_color);
     state.printed = true;
     info!("vxl asset loaded: {:?}", vxl);
     info!("palette asset loaded: {:?}", palette);
