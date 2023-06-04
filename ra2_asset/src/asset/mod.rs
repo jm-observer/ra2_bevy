@@ -1,9 +1,10 @@
 mod ini;
 mod palette;
-pub mod vxl;
+mod vxl;
 
 pub use ini::*;
 pub use palette::*;
+pub use vxl::*;
 
 pub fn is_value_array(key: &str) -> bool {
     match key {

@@ -2,8 +2,8 @@
 
 use bevy::prelude::*;
 use ra2_asset::{
-    asset::{vxl::VxlFile, Palette}, 
-    loader::{PaletteLoader}
+    asset::{Palette, VxlFile},
+    loader::{PaletteLoader, VxlAssetLoader}
 };
 
 fn main() {
@@ -12,9 +12,10 @@ fn main() {
         .add_asset::<VxlFile>()
         .add_asset::<Palette>()
         .add_asset_loader(PaletteLoader)
+        .add_asset_loader(VxlAssetLoader)
         // .init_asset_loader::<CustomAssetLoader>()
         .add_systems(Startup, setup)
-        // .add_systems(Update, print_on_load)
+        .add_systems(Update, print_on_load)
         .run();
 }
 
@@ -22,8 +23,24 @@ fn main() {
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>
+    mut materials: ResMut<Assets<StandardMaterial>>,
+    mut assert_server: ResMut<AssetServer>
 ) {
+    let vxl = assert_server.load("vxl/1tnk.vxl");
+    let palette = assert_server.load("palettes/uniturb.pal");
+
+    commands.insert_resource(CustomRes {
+        vxl,
+        palette,
+        printed: false
+    });
+
+    commands.spawn(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+        transform: Transform::from_xyz(0.0, 0.5, 0.0),
+        ..default()
+    });
     // light
     commands.spawn(PointLightBundle {
         point_light: PointLight {
@@ -41,12 +58,27 @@ fn setup(
     });
 }
 
-// fn print_on_load(mut state: ResMut<State>, custom_assets: ResMut<Assets<CustomAsset>>) {
-//     let custom_asset = custom_assets.get(&state.handle);
-//     if state.printed || custom_asset.is_none() {
-//         return;
-//     }
+fn print_on_load(
+    mut state: ResMut<CustomRes>,
+    vxl_assets: ResMut<Assets<VxlFile>>,
+    palette_assets: ResMut<Assets<Palette>>
+) {
+    let vxl_asset = vxl_assets.get(&state.vxl);
+    let palette_asset = palette_assets.get(&state.palette);
+    if state.printed {
+        return;
+    }
+    let (Some(vxl), Some(palette)) = (vxl_asset, palette_asset) else {
+        return;
+    };
+    state.printed = true;
+    info!("vxl asset loaded: {:?}", vxl);
+    info!("palette asset loaded: {:?}", palette);
+}
 
-//     info!("Custom asset loaded: {:?}", custom_asset.unwrap());
-//     state.printed = true;
-// }
+#[derive(Resource)]
+pub struct CustomRes {
+    pub palette: Handle<Palette>,
+    pub vxl:     Handle<VxlFile>,
+    pub printed: bool
+}

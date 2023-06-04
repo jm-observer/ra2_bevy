@@ -1,18 +1,17 @@
-use bevy::prelude::*;
-use bevy::reflect::TypeUuid;
+use bevy::{prelude::*, reflect::TypeUuid};
 use ra2_data::vxl::{Section, SectionOrigin, Span, Voxel, VxlFileOrigin};
 
 #[derive(Clone, Debug, TypeUuid, Default)]
 #[uuid = "d814dd88-474e-429d-b4d4-de4d9d1dec6e"]
 pub struct VxlFile {
-    pub name:     String,
+    // pub name:     String,
     pub sections: Vec<Section>
 }
 
 impl VxlFile {
-    pub fn deal(origin: VxlFileOrigin, name: String) -> Self {
-        let mut vxl = VxlFile {
-            name,
+    pub fn deal(origin: VxlFileOrigin) -> Self {
+        let mut vxl: VxlFile = VxlFile {
+            // name,
             sections: Vec::with_capacity(origin.sections.len())
         };
         origin.sections.into_iter().for_each(|val| {
