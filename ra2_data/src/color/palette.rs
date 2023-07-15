@@ -1,7 +1,7 @@
-use bevy::reflect::TypeUuid;
-use ra2_data::color::RaColor;
+use crate::color::RaColor;
+use anyhow::{bail, Result};
+use bevy::{log::error, reflect::TypeUuid};
 use serde_json::Value;
-
 
 #[derive(Clone, Debug, TypeUuid, Default)]
 #[uuid = "3c047c2f-2173-44f5-bdfd-c3087c8d89e2"]
@@ -11,7 +11,7 @@ pub struct Palette {
 }
 
 impl Palette {
-    pub fn new(val: Value) -> Self {
+    pub fn new(val: Value) -> Result<Self> {
         if val.is_array() {
             let val_array = val.as_array().unwrap().as_slice();
             let mut index: usize = 0;
@@ -25,9 +25,9 @@ impl Palette {
                 ));
                 index += 1;
             }
-            Palette { colors }
+            Ok(Palette { colors })
         } else {
-            panic!("");
+            bail!("Palette should be array");
         }
     }
 
@@ -59,7 +59,7 @@ impl Palette {
     }
 
     pub fn get_hash(&self) {
-        panic!("");
+        error!("todo");
     }
 
     pub fn remap(&mut self, e: &RaColor) {

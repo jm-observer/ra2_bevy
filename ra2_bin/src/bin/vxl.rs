@@ -5,10 +5,10 @@ use bevy::{
     render::{mesh::VertexAttributeValues, render_resource::PrimitiveTopology}
 };
 use ra2_asset::{
-    asset::{Palette, VxlFile},
+    asset::VxlFile,
     loader::{PaletteLoader, VxlAssetLoader}
 };
-use ra2_data::color::RaColor;
+use ra2_data::color::{Palette, RaColor};
 
 fn main() {
     App::new()
@@ -101,7 +101,7 @@ fn print_on_load(
         }
         render_mesh.insert_attribute(
             Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Float32x3(positions)
+            VertexAttributeValues::Sint32x3(positions)
         );
 
         render_mesh.insert_attribute(

@@ -4,7 +4,7 @@ use bevy::{
 };
 use ra2_data::vxl::VxlFileOrigin;
 
-use crate::asset::VxlFile;
+use crate::{asset::VxlFile, loader::get_file_name};
 
 #[derive(Default)]
 pub struct VxlAssetLoader;
@@ -16,8 +16,9 @@ impl AssetLoader for VxlAssetLoader {
         load_context: &'b mut LoadContext
     ) -> bevy::utils::BoxedFuture<'b, anyhow::Result<(), anyhow::Error>> {
         Box::pin(async move {
+            let name = get_file_name(&load_context)?;
             let val: VxlFileOrigin = serde_json::from_slice(bytes).unwrap();
-            let asset = VxlFile::deal(val);
+            let asset = VxlFile::deal(val, name);
             load_context.set_default_asset(LoadedAsset::new(asset));
             Ok(())
         })

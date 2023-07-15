@@ -1,6 +1,8 @@
-use bevy::{asset::{AssetLoader, LoadedAsset}, log::error};
-
-use crate::asset::Palette;
+use bevy::{
+    asset::{AssetLoader, LoadedAsset},
+    log::error
+};
+use ra2_data::color::Palette;
 
 pub struct PaletteLoader;
 

@@ -1,9 +1,9 @@
 mod ini;
-mod palette;
+mod tile;
 mod vxl;
 
 pub use ini::*;
-pub use palette::*;
+pub use tile::*;
 pub use vxl::*;
 
 pub fn is_value_array(key: &str) -> bool {

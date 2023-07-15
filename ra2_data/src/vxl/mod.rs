@@ -75,27 +75,26 @@ impl Section {
             3u32 => NORMALS_3.as_ref(),
             4u32 => NORMALS_4.as_ref(),
             _ => {
-                panic!()
+                error!("todo");
+                panic!("todo");
             }
         }
     }
 }
 #[derive(Debug, Clone)]
 pub struct Span {
-    pub x:      f32,
-    pub y:      f32,
+    pub x:      i32,
+    pub y:      i32,
     pub voxels: Vec<Voxel>
 }
-
 #[derive(Debug, Clone)]
 pub struct Voxel {
-    pub x:            f32,
-    pub y:            f32,
-    pub z:            f32,
+    pub x:            i32,
+    pub y:            i32,
+    pub z:            i32,
     pub color_index:  usize,
     pub normal_index: usize
 }
-
 const NORMALS_1: [[f32; 3]; 16] = [
     [0.54946297, -183e-6, -0.835518],
     [0.00014400001, 0.54940403, -0.83555698],

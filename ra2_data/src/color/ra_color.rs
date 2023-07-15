@@ -1,4 +1,5 @@
 use crate::pub_use::*;
+use anyhow::{bail, Result};
 
 #[derive(Copy, Clone, Debug, Serialize, Deserialize, Hash, Resource)]
 pub struct RaColor {
@@ -20,7 +21,7 @@ impl RaColor {
         RaColor::new(r, g, b)
     }
 
-    pub fn from_hsv(t: f32, i: f32, n: f32) -> Self {
+    pub fn from_hsv(t: f32, i: f32, n: f32) -> Result<Self> {
         let s: f32;
         let r: f32;
         let a: f32;
@@ -70,24 +71,24 @@ impl RaColor {
                     r = e;
                     a = o;
                 },
-                _ => {
-                    panic!()
+                ty => {
+                    bail!("h should not be {}", ty);
                 }
             }
         }
-        Self::from_rgb((255f32 * s) as u8, (255f32 * r) as u8, (255f32 * a) as u8)
+        Ok(Self::from_rgb(
+            (255f32 * s) as u8,
+            (255f32 * r) as u8,
+            (255f32 * a) as u8
+        ))
     }
 
     pub fn as_hex(&self) {
-        panic!("");
+        error!("todo");
     }
 
     pub fn as_hex_string(&self) {
-        panic!("");
-    }
-
-    pub fn clone(&self) {
-        panic!("");
+        error!("todo");
     }
 
     pub fn remap(&mut self, color: &RaColor, index: usize) {

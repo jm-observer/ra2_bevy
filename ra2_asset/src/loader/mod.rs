@@ -1,9 +1,11 @@
 mod ini;
 mod palette;
+mod tile;
 mod vxl;
 
 pub use ini::*;
 pub use palette::*;
+pub use tile::*;
 pub use vxl::*;
 
 use anyhow::{anyhow, Result};
