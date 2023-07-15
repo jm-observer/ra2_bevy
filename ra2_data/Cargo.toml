@@ -16,3 +16,4 @@ png = "0.17.8"
 ra2_util = { path = "../ra2_util"}
 num_enum = "0.6.1"
 anyhow = "1.0.71"
+configparser = "3.0.2"

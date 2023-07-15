@@ -1,4 +1,4 @@
-use bevy::log::{error, warn};
+use bevy::log::error;
 
 pub const ISO_TILE_SIZE: i32 = 30;
 pub const ISO_TILE_HEIGHT: i32 = 15;

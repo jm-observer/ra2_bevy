@@ -1,6 +1,5 @@
 use bevy::{
-    asset::{AssetLoader, LoadContext, LoadedAsset},
-    utils::BoxedFuture
+    asset::{AssetLoader, LoadContext, LoadedAsset}
 };
 use ra2_data::vxl::VxlFileOrigin;
 

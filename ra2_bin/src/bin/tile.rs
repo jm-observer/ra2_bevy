@@ -1,14 +1,13 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
 use bevy::{
-    prelude::*,
-    render::{mesh::VertexAttributeValues, render_resource::PrimitiveTopology}
+    prelude::*
 };
 use ra2_asset::{
-    asset::{TileAsset, TileTexture, VxlFile},
-    loader::{PaletteLoader, TilesAssetLoader, VxlAssetLoader}
+    asset::{TileAsset},
+    loader::{PaletteLoader, TilesAssetLoader}
 };
-use ra2_data::color::{Palette, RaColor};
+use ra2_data::color::{Palette};
 
 fn main() {
     App::new()
@@ -23,7 +22,7 @@ fn main() {
 }
 
 /// set up a simple 3D scene
-fn setup(mut commands: Commands, mut assert_server: ResMut<AssetServer>) {
+fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
 
@@ -41,9 +40,9 @@ fn setup(mut commands: Commands, mut assert_server: ResMut<AssetServer>) {
 
 fn print_on_load(
     mut commands: Commands,
-    mut state: ResMut<CustomRes>,
+    state: ResMut<CustomRes>,
     tile_assets: ResMut<Assets<TileAsset>>,
-    mut palette_assets: ResMut<Assets<Palette>>,
+    palette_assets: ResMut<Assets<Palette>>,
     mut asset_textures: ResMut<Assets<Image>>
 ) {
     let tile_asset = tile_assets.get(&state.tile);

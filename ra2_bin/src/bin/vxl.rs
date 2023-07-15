@@ -26,9 +26,9 @@ fn main() {
 /// set up a simple 3D scene
 fn setup(
     mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    mut assert_server: ResMut<AssetServer>
+    _meshes: ResMut<Assets<Mesh>>,
+    _materials: ResMut<Assets<StandardMaterial>>,
+    assert_server: ResMut<AssetServer>
 ) {
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");

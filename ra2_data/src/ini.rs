@@ -1,11 +1,32 @@
-use crate::GetEnum;
-use anyhow::{anyhow, bail, Result};
-use bevy::prelude::{error, warn};
-use ra2_util::{
-    get_value_map, split_by_regex, DEFAULT_REGEX,
-    GET_NUMBER_ARRAY_REGEX
-};
+use crate::{is_value_array, pub_use::*, GetEnum};
+use bevy::log::error;
+use configparser::ini::Ini;
+use ra2_util::{get_value_map, split_by_regex, DEFAULT_REGEX, GET_NUMBER_ARRAY_REGEX};
 use serde_json::{Map, Value};
+use std::{
+    collections::HashMap,
+    prelude::rust_2015::Ok,
+    sync::{Arc, RwLock}
+};
+
+pub trait IniSectionTrait {
+    fn get_string(&self, key: &str) -> String;
+    fn get_number(&self, key: &str) -> f32;
+    fn get_number_default(&self, key: &str, default: f32) -> f32;
+}
+impl IniSectionTrait for RwLock<IniSection> {
+    fn get_string(&self, key: &str) -> String {
+        self.read().unwrap().get_string(key)
+    }
+
+    fn get_number(&self, key: &str) -> f32 {
+        self.read().unwrap().get_number(key)
+    }
+
+    fn get_number_default(&self, key: &str, default: f32) -> f32 {
+        self.read().unwrap().get_number_default(key, default)
+    }
+}
 
 #[derive(Debug)]
 pub struct IniSection {
@@ -62,10 +83,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_i32_from_str_option(
-        &self,
-        key: &str
-    ) -> Option<i32> {
+    pub fn get_number_i32_from_str_option(&self, key: &str) -> Option<i32> {
         if let Some(val) = self.get_string_option(key) {
             let Ok(rs) = val.parse::<i32>() else {
                 return None;
@@ -76,10 +94,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_f32_from_str_option(
-        &self,
-        key: &str
-    ) -> Option<f32> {
+    pub fn get_number_f32_from_str_option(&self, key: &str) -> Option<f32> {
         if let Some(val) = self.get_string_option(key) {
             let Ok(res) = val.parse::<f32>() else {
                 error!("parse f32 fail: key={:?} {}", key, val);
@@ -100,11 +115,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_i32_from_str_default(
-        &self,
-        key: &str,
-        default: i32
-    ) -> i32 {
+    pub fn get_number_i32_from_str_default(&self, key: &str, default: i32) -> i32 {
         if let Some(val) = self.get_number_i32_from_str_option(key) {
             val
         } else {
@@ -125,11 +136,7 @@ impl IniSection {
         self.get_string_default(key, "")
     }
 
-    pub fn get_string_default(
-        &self,
-        key: &str,
-        default: &str
-    ) -> String {
+    pub fn get_string_default(&self, key: &str, default: &str) -> String {
         self.get_string_result(key).unwrap_or(default.to_string())
     }
 
@@ -201,11 +208,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_i32_default(
-        &self,
-        key: &str,
-        default: i32
-    ) -> i32 {
+    pub fn get_number_i32_default(&self, key: &str, default: i32) -> i32 {
         if let Some(val) = self.get_number_i32_option(key) {
             val
         } else {
@@ -213,11 +216,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_bool_or_default(
-        &self,
-        key: &str,
-        default: bool
-    ) -> bool {
+    pub fn get_bool_or_default(&self, key: &str, default: bool) -> bool {
         if let Some(val) = self.get_bool_option(key) {
             val
         } else {
@@ -280,17 +279,12 @@ impl IniSection {
             .unwrap_or(Vec::new())
     }
 
-    pub fn get_number_array(
-        &self,
-        key: &str,
-        regex: &str
-    ) -> Result<Vec<f32>> {
+    pub fn get_number_array(&self, key: &str, regex: &str) -> Result<Vec<f32>> {
         let n = self.get_string_option(key);
         let mut res = Vec::new();
         if let Some(n) = n {
             let n = n.trim();
-            let regex_tmp =
-                regex::Regex::new(GET_NUMBER_ARRAY_REGEX)?;
+            let regex_tmp = regex::Regex::new(GET_NUMBER_ARRAY_REGEX)?;
             let rs = split_by_regex(n, regex)?;
             for r in rs {
                 let t: f32 = if regex_tmp.is_match(r.as_str()) {
@@ -306,12 +300,7 @@ impl IniSection {
     }
 
     ///no_case: 大小写不敏感，true：不管大小写。默认为false
-    pub fn get_enum(
-        &self,
-        e: &str,
-        enums: impl GetEnum,
-        no_case: bool
-    ) -> i32 {
+    pub fn get_enum(&self, e: &str, enums: impl GetEnum, no_case: bool) -> i32 {
         let s = self.get_string_option(e);
         if let Some(s) = s {
             let Some( val) = enums.get_num_by_str(s.as_str())else  {
@@ -327,18 +316,8 @@ impl IniSection {
         }
     }
 
-    pub fn get_enum_array_default(
-        &self,
-        t: &str,
-        enums: impl GetEnum
-    ) -> Vec<i32> {
-        self.get_enum_array(
-            t,
-            enums,
-            DEFAULT_REGEX,
-            Vec::with_capacity(20),
-            false
-        )
+    pub fn get_enum_array_default(&self, t: &str, enums: impl GetEnum) -> Vec<i32> {
+        self.get_enum_array(t, enums, DEFAULT_REGEX, Vec::with_capacity(20), false)
     }
 
     pub fn get_enum_array(
@@ -352,20 +331,16 @@ impl IniSection {
         let r = self.get_string_option(t);
         if let Some(r) = r {
             let mut res = Vec::<i32>::with_capacity(20);
-            let vals =
-                split_by_regex(r.as_str(), i).unwrap_or(Vec::new());
+            let vals = split_by_regex(r.as_str(), i).unwrap_or(Vec::new());
             for o in vals {
                 let mut i = false;
                 if no_case {
-                    if let Some(e) =
-                        enums.get_num_by_lowercase_str(o.as_str())
-                    {
+                    if let Some(e) = enums.get_num_by_lowercase_str(o.as_str()) {
                         res.push(e);
                         i = true;
                     }
                 } else {
-                    if let Some(e) = enums.get_num_by_str(o.as_str())
-                    {
+                    if let Some(e) = enums.get_num_by_str(o.as_str()) {
                         res.push(e);
                         i = true;
                     }
@@ -386,5 +361,79 @@ impl IniSection {
 
     pub fn get_concatented_values() {
         //todo
+    }
+}
+#[derive(Clone, Debug)]
+pub struct IniFile {
+    pub name:     String,
+    pub sections: HashMap<String, Arc<IniSection>>
+}
+
+impl IniFile {
+    pub fn new(name: String, val: Value, ini: Option<Ini>) -> Result<Self> {
+        // let name = string_to_static_str(name);
+        let secs = get_value_map(val)?;
+        let mut sections = HashMap::<String, IniSection>::with_capacity(secs.len() + 10);
+        for (key, val) in secs {
+            sections.insert(key.clone(), IniSection::new(val, key)?);
+        }
+        //mergeWith
+        if let Some(ini) = ini {
+            let maps = ini.get_map().ok_or(anyhow!("none"))?;
+            for (key, map) in maps {
+                if !sections.contains_key(key.as_str()) {
+                    sections.insert(key.clone(), IniSection::new_empty(key.clone()));
+                };
+                let tmp = sections
+                    .get_mut(key.as_str())
+                    .ok_or(anyhow!("sections not contail: {}", key))?;
+                if is_value_array(key.as_str()) {
+                    bail!("should not be array");
+                } else {
+                    for (key, val) in map {
+                        let Some(val) = val else {
+                            warn!("key {} is none", key);
+                            continue
+                        };
+                        tmp.set(key, val);
+                    }
+                }
+            }
+        }
+        let sections = sections
+            .into_iter()
+            .map(|(key, val)| (key, Arc::new(val)))
+            .collect::<HashMap<String, Arc<IniSection>>>();
+        Ok(IniFile { name, sections })
+    }
+
+    pub fn get_or_create_section(&mut self, key: &str) -> Arc<IniSection> {
+        let Some(section) = self.sections.get(key) else {
+            let tmp =
+                Arc::new(IniSection::new_empty(key.to_string()));
+            self.sections.insert(key.to_string(), tmp.clone());
+            return tmp;
+        };
+        section.clone()
+    }
+
+    pub fn get_section(&self, key: &str) -> Result<Arc<IniSection>> {
+        //rules.ini去掉了NAWAST "GARADR" CAIRSFGL "NAHPAD"
+        // debug!("name={}, key={}", &self.name, key);
+        if let Some(section) = self.sections.get(key) {
+            Ok(section.clone())
+        } else {
+            bail!("get_section fail: name={}, key={}", &self.name, key);
+        }
+    }
+
+    pub fn get_section_option(&self, key: &str) -> Option<&Arc<IniSection>> {
+        //rules.ini去掉了NAWAST "GARADR" CAIRSFGL "NAHPAD"
+        // debug!("name={}, key={}", &self.name, key);
+        self.sections.get(key)
+    }
+
+    pub fn get_ordered_sections(&self) -> &HashMap<String, Arc<IniSection>> {
+        &self.sections
     }
 }

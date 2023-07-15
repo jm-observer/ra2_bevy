@@ -2,7 +2,7 @@ use crate::{
     color::{Bitmap, RaColor},
     pub_use::*
 };
-use base64::decode;
+use base64::{engine::general_purpose::STANDARD, Engine};
 
 #[derive(Serialize, Deserialize)]
 pub struct TileFile {
@@ -48,11 +48,11 @@ pub struct TileImage {
 
 impl TileImage {
     pub fn get_tile_data(&self) -> Vec<u8> {
-        decode(&self.tile_data).unwrap()
+        STANDARD.decode(&self.tile_data).unwrap()
     }
 
     pub fn get_extra_data(&self) -> Vec<u8> {
-        decode(self.extra_data.as_ref().unwrap()).unwrap()
+        STANDARD.decode(self.extra_data.as_ref().unwrap()).unwrap()
     }
 
     pub fn n(num: i32) -> i32 {
@@ -126,6 +126,7 @@ impl TileImage {
         let mut update_row = 0;
         //每行需要更新的像素数量
         let mut update_row_pixel_amount = 0;
+
         //上半段：正三角形
         while update_row < o {
             //d=每行的像素点数=上一行的像素点数+4

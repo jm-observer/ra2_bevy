@@ -106,7 +106,7 @@ impl Bitmap {
         let mut bitmap = Self::rgba_bitmap(self.width, self.height);
         //debug_draw_indexed_image
         bitmap.draw_indexed_image(self, 0, 0);
-        bitmap.update_from_palette(palette);
+        bitmap.update_from_palette(palette)?;
         Ok(bitmap)
     }
 
@@ -131,7 +131,7 @@ impl Bitmap {
                 let array = self.data.as_mut_slice();
                 let lenth = array.len();
                 let mut tmp: usize;
-                let palette_index = 0usize;
+                let _palette_index = 0usize;
                 while index < lenth {
                     tmp = array[index] as usize;
                     // palette_index = (tmp * interval) as usize;
@@ -163,7 +163,7 @@ impl Bitmap {
                 let array = self.data.as_mut_slice();
                 let lenth = array.len();
                 let mut tmp: usize;
-                let palette_index = 0usize;
+                let _palette_index = 0usize;
                 while index < lenth {
                     tmp = array[index] as usize;
                     // palette_index = (tmp * interval) as usize;
@@ -202,8 +202,8 @@ impl Bitmap {
         let l = n * a * (self.height as usize);
         let mut c = (0 + o * i as usize + n * t as usize) as usize;
         let mut h = 0;
-        for s in 0..pip_height {
-            for t in 0..pip_width {
+        for _s in 0..pip_height {
+            for _t in 0..pip_width {
                 let data = *pip.data.get(h).unwrap();
                 if data != 0u8 && c < l {
                     r[c] = data;
@@ -242,10 +242,10 @@ impl Bitmap {
         let mut h = 0;
         let mut start_index: (usize, bool);
         let mut last_index: usize;
-        for s in 0..pip_height {
+        for _s in 0..pip_height {
             start_index = (0usize, false);
             last_index = 0usize;
-            for t in 0..pip_width {
+            for _t in 0..pip_width {
                 let data = *pip.data.get(h).unwrap();
                 if data != 0u8 && c < l {
                     if !start_index.1 {

@@ -1,4 +1,4 @@
-use crate::{asset::IniFile, loader::get_file_name};
+use crate::{asset::IniAsset, loader::get_file_name};
 use anyhow::Result;
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
@@ -29,6 +29,6 @@ async fn load<'b>(bytes: &[u8], load_context: &mut LoadContext<'b>) -> Result<()
     let name = get_file_name(&load_context)?;
     let val: Value = serde_json::from_slice(bytes)?;
     debug!("IniFileAssetLoaderFile {} loading", name);
-    load_context.set_default_asset(LoadedAsset::new(IniFile::new(name, val, None)?));
+    load_context.set_default_asset(LoadedAsset::new(IniAsset::new(name, val, None)?));
     Ok(())
 }
