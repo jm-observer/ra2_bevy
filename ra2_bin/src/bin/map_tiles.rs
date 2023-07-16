@@ -31,7 +31,7 @@ fn main() {
 
 /// set up a simple 3D scene
 fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
-    let palette = asset_server.load("palettes/unittem.pal");
+    let palette = asset_server.load("palettes/isotem.pal");
     let tiles = asset_server.load_folder("tile/tiles.tem").unwrap();
     let temperate_ini = asset_server
         .load::<IniAsset, &str>("ini/temperate.ini")
@@ -61,7 +61,6 @@ fn print_on_load(
     inis: ResMut<Assets<IniAsset>>,
     maps: ResMut<Assets<MapAsset>>,
     mut asset_textures: ResMut<Assets<Image>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>
 ) {
     if state.printed {
@@ -116,12 +115,7 @@ fn print_on_load(
     ));
 
     let tiles = MapTileCollection::init(&map.tiles, tcr, rule);
-    create_map_tile_sprites(
-        &mut asset_textures,
-        &mut materials,
-        &mut commands,
-        Arc::new(tiles)
-    );
+    create_map_tile_sprites(&mut commands, Arc::new(tiles));
     state.printed = true;
 }
 
