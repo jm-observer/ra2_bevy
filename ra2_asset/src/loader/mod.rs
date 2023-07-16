@@ -1,9 +1,11 @@
 mod ini;
+mod map;
 mod palette;
 mod tile;
 mod vxl;
 
 pub use ini::*;
+pub use map::*;
 pub use palette::*;
 pub use tile::*;
 pub use vxl::*;

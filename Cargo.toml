@@ -1,5 +1,5 @@
 [workspace]
-members = ["ra2_asset", "ra2_util", "ra2_data", "ra2_resource", "ra2_bin"]
+members = ["ra2_asset", "ra2_util", "ra2_data", "ra2_render", "ra2_bin"]
 resolver = "2" # Important! wgpu/Bevy needs this!
 
 

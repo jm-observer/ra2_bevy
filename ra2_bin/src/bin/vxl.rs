@@ -33,9 +33,9 @@ fn setup(
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
 
-    let vxl = assert_server.load("vxl/1tnk.vxl");
+    let vxl = assert_server.load("../../resource/horv.vxl");
 
-    let palette = assert_server.load("palettes/uniturb.pal");
+    let palette = assert_server.load("../../resource/unittem.pal");
 
     commands.insert_resource(CustomRes {
         vxl,
@@ -96,12 +96,12 @@ fn print_on_load(
         for vxl in section.get_all_voxels() {
             let color = palette.colors.get(vxl.color_index).unwrap();
             colors.push([color.r as f32, color.g as f32, color.b as f32, 1.0]);
-            positions.push([vxl.x, vxl.y, vxl.z]);
+            positions.push([vxl.x as f32, vxl.y as f32, vxl.z as f32]);
             normals.push(normal.get(vxl.normal_index).unwrap().clone());
         }
         render_mesh.insert_attribute(
             Mesh::ATTRIBUTE_POSITION,
-            VertexAttributeValues::Sint32x3(positions)
+            VertexAttributeValues::Float32x3(positions)
         );
 
         render_mesh.insert_attribute(

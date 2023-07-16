@@ -4,3 +4,4 @@ pub use bevy::{
     prelude::*
 };
 pub use serde::{Deserialize, Serialize};
+pub use std::sync::Arc;

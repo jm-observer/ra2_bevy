@@ -17,3 +17,7 @@ ra2_util = { path = "../ra2_util"}
 num_enum = "0.6.1"
 anyhow = "1.0.71"
 configparser = "3.0.2"
+#enum：通过i32来获取enum
+num = "0.4"
+num-derive = "0.3"
+num-traits = "0.2"

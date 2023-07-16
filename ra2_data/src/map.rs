@@ -46,7 +46,7 @@ pub struct MapFile {
     pub overlays:     Vec<Overlay>,
     pub smudges:      Vec<Arc<MapObject>>,
     pub infantries:   Vec<Arc<MapObject>>,
-    pub vehicles:     Vec<Arc<MapObject>>,
+    pub vehicles:     Vec<Arc<MapObject>>, /*  */
     pub aircrafts:    Vec<Arc<MapObject>>
 }
 

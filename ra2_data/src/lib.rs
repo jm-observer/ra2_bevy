@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub mod color;
 pub mod coord;
 pub mod countries;
@@ -7,13 +9,15 @@ pub mod lighting;
 pub mod map;
 pub mod map_object;
 pub mod overlay;
-pub mod pub_use;
+pub(crate) mod pub_use;
 pub mod resource;
+pub mod rule;
 pub mod shp;
 pub mod size;
 pub mod structure;
 pub mod theater;
 pub mod tile;
+pub mod ty;
 pub mod vxl;
 
 pub trait GetEnum {

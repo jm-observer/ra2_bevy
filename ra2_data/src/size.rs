@@ -16,3 +16,22 @@ impl RaSize {
         }
     }
 }
+
+/// 宽高。程序屏幕的大小
+#[derive(Copy, Clone, Debug)]
+pub struct WHSize {
+    pub width:  i32,
+    pub height: i32
+}
+impl WHSize {
+    pub fn init() -> Self {
+        WHSize {
+            width:  0,
+            height: 0
+        }
+    }
+
+    pub fn new(width: i32, height: i32) -> Self {
+        WHSize { width, height }
+    }
+}

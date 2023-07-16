@@ -2,6 +2,7 @@ use crate::{asset::IniAsset, loader::get_file_name};
 use anyhow::Result;
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
+    log::info,
     prelude::debug,
     utils::BoxedFuture
 };
@@ -16,7 +17,7 @@ impl AssetLoader for IniFileAssetLoader {
         &'b self,
         bytes: &'b [u8],
         load_context: &'b mut LoadContext
-    ) -> BoxedFuture<'b, anyhow::Result<()>> {
+    ) -> BoxedFuture<'b, Result<()>> {
         Box::pin(load(bytes, load_context))
     }
 
@@ -28,7 +29,7 @@ impl AssetLoader for IniFileAssetLoader {
 async fn load<'b>(bytes: &[u8], load_context: &mut LoadContext<'b>) -> Result<()> {
     let name = get_file_name(&load_context)?;
     let val: Value = serde_json::from_slice(bytes)?;
-    debug!("IniFileAssetLoaderFile {} loading", name);
+    info!("IniFileAssetLoaderFile {} loading", name);
     load_context.set_default_asset(LoadedAsset::new(IniAsset::new(name, val, None)?));
     Ok(())
 }

@@ -1,15 +1,14 @@
-
-use anyhow::{Result};
-use bevy::{reflect::TypeUuid};
+use anyhow::Result;
+use bevy::reflect::TypeUuid;
 use configparser::ini::Ini;
-use ra2_data::ini::{IniFile};
+use ra2_data::ini::IniFile;
 
 use serde_json::Value;
-use std::{ops::Deref};
+use std::ops::Deref;
 
 #[derive(Clone, Debug, TypeUuid)]
 #[uuid = "b0298126-fc12-4767-8d0f-ddab3da2ebf8"]
-pub struct IniAsset(IniFile);
+pub struct IniAsset(pub IniFile);
 
 impl IniAsset {
     pub fn new(name: String, val: Value, ini: Option<Ini>) -> Result<Self> {
