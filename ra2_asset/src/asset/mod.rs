@@ -1,10 +1,12 @@
 mod ini;
 mod map;
+mod shp;
 mod tile;
 mod vxl;
 
 pub use ini::*;
 pub use map::*;
+pub use shp::*;
 pub use tile::*;
 pub use vxl::*;
 
