@@ -1,10 +1,11 @@
 use bevy::prelude::*;
 use ra2_data::coord::{ISO_TILE_HEIGHT, ISO_TILE_SIZE};
+// use ra2_data::coord::{ISO_TILE_HEIGHT, ISO_TILE_SIZE};
 
-#[derive(Resource)]
-pub struct CursorShpRes {
-    pub atlas_handle: Handle<TextureAtlas>
-}
+// #[derive(Resource)]
+// pub struct CursorShpRes {
+//     pub atlas_handle: Handle<TextureAtlas>
+// }
 #[derive(Debug, Resource)]
 pub struct CoordsBound {
     /// 光标的限制区域（左下角坐标, 右上角坐标组成一个长方形区域）
@@ -32,8 +33,8 @@ impl CoordsBound {
         map_height: f32,
         full_size_width: i32
     ) -> Self {
-        /// 地图左上角为坐标（0.0， 0.0， 0.0），还有一种地图左下角为（0.0，
-        /// 0.0， 0.0） 为查看效果，矩形区域扩大
+        // 地图左上角为坐标（0.0， 0.0， 0.0），还有一种地图左下角为（0.0，
+        // 0.0， 0.0） 为查看效果，矩形区域扩大
         let extend = 50.0;
         let cursor_left_down_vertex = Vec3::new(0.0 - extend, -1.0 * map_height - extend, 0.0);
         let cursor_right_up_vertex = Vec3::new(map_width + extend, 0.0 + extend, 0.0);
@@ -53,6 +54,7 @@ impl CoordsBound {
         }
     }
 
+    #[allow(unused_variables)]
     pub fn tile_3d_to_world(rx: i32, ry: i32, z: i32) {}
 
     pub fn rxy_tran_to_dxy(&self, rx: i32, ry: i32) -> (i32, i32) {

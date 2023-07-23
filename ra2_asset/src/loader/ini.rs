@@ -3,7 +3,6 @@ use anyhow::Result;
 use bevy::{
     asset::{AssetLoader, LoadContext, LoadedAsset},
     log::info,
-    prelude::debug,
     utils::BoxedFuture
 };
 use serde_json::Value;

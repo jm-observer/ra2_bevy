@@ -1,12 +1,17 @@
-use super::res::*;
-use bevy::{asset::HandleId, prelude::*};
-use ra2_asset::asset::ShpAsset;
+use crate::cursor::Cursor;
+use bevy::{
+    asset::{HandleId, LoadState},
+    prelude::*
+};
+use ra2_asset::{asset::ShpAsset, DebugGameState};
 use ra2_data::color::Palette;
 
-pub type CursorShpStatus = CommonAssetLoader<CursorShp>;
+#[derive(Resource)]
 pub struct CursorShp {
-    pub shp: ShpCommonLoader,
-    pub pal: PaletteCommonLoader
+    pub shp:          Handle<ShpAsset>,
+    pub pal:          Handle<Palette>,
+    pub asset_server: AssetServer,
+    pub init:         bool
 }
 impl CursorShp {
     pub fn new(asset_server: &AssetServer) -> Self {
@@ -15,43 +20,49 @@ impl CursorShp {
         println!("shp.id={:?}, id={:?}", shp.id(), id);
         let pal = asset_server.load("palettes/mousepal.pal").into();
         Self {
-            shp: shp.into(),
-            pal
+            shp,
+            pal,
+            init: false,
+            asset_server: asset_server.clone()
         }
     }
 }
 
-impl Loading for CursorShp {
-    fn loading(&mut self, server: &AssetServer) -> bool {
-        self.pal.loading(server) && self.shp.loading(server)
+pub fn init_cursor(
+    mut cursor_shp: ResMut<CursorShp>,
+    pal_assets: Res<Assets<Palette>>,
+    shp_assets: Res<Assets<ShpAsset>>,
+    mut textures: ResMut<Assets<Image>>,
+    mut commands: Commands,
+    mut texture_atlases: ResMut<Assets<TextureAtlas>>
+) {
+    if !(cursor_shp.asset_server.get_load_state(&cursor_shp.pal) == LoadState::Loaded
+        && cursor_shp.asset_server.get_load_state(&cursor_shp.shp) == LoadState::Loaded)
+    {
+        return;
     }
-}
-impl CursorShpStatus {
-    pub fn new_status(server: &AssetServer) -> CursorShpStatus {
-        Self::new(CursorShp::new(server))
+    if cursor_shp.init {
+        return;
     }
+    info!("CursorShpStatus.init");
+    let pal = pal_assets.get(&cursor_shp.pal).unwrap();
+    let shp = shp_assets.get(&cursor_shp.shp).unwrap();
 
-    pub fn init(
-        &mut self,
-        asset_server: &AssetServer,
-        pal_assets: &Assets<Palette>,
-        shp_assets: &Assets<ShpAsset>,
-        textures: &mut Assets<Image>,
-        commands: &mut Commands,
-        texture_atlases: &mut Assets<TextureAtlas>
-    ) {
-        if self.loading(asset_server) && !self.is_inited() {
-            info!("CursorShpStatus.init");
-            let pal = pal_assets
-                .get(&self.get_asset_ref().pal.1.cast_weak())
-                .unwrap();
-            let shp = shp_assets
-                .get(&self.get_asset_ref().shp.1.cast_weak())
-                .unwrap();
+    let atlas_handle = shp
+        .gen_texture_atlas(&mut textures, pal, &mut texture_atlases)
+        .unwrap();
 
-            let atlas_handle = shp.gen_texture_atlas(textures, pal, texture_atlases);
-            commands.insert_resource(CursorShpRes { atlas_handle });
-            self.set_inited();
-        }
-    }
+    commands
+        .spawn(SpriteSheetBundle {
+            transform: Transform {
+                translation: Vec3::new(0.0, 0.0, 100.0),
+                scale: Vec3::splat(1.0),
+                ..Default::default()
+            },
+            sprite: TextureAtlasSprite::new(0),
+            texture_atlas: atlas_handle,
+            ..Default::default()
+        })
+        .insert(Cursor::default());
+    cursor_shp.init = true;
 }

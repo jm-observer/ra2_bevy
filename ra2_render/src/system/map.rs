@@ -30,18 +30,17 @@ pub fn create_map_tile_sprites(command: &mut Commands, tiles: Arc<MapTileCollect
     );
     println!("draw sprint's num : {}", tiles.tiles.len());
     for (_index, arc_map_tile_units) in tiles.tiles.iter().enumerate() {
-        let map_tile_units = &arc_map_tile_units.0;
-        let i = map_tile_units.tile_num;
+        let tile = &arc_map_tile_units.0;
+        let i = tile.tile_num;
         let n = tiles.tile_sets.get_tile(i);
 
-        let x_c = (map_tile_units.dx * map_tile_units.block_width) as f32 / 2.0;
-        let y_c =
-            ((map_tile_units.dy - map_tile_units.z) * map_tile_units.block_heigth) as f32 / 2.0;
+        let x_c = (tile.dx * tile.block_width) as f32 / 2.0;
+        let y_c = ((tile.dy - tile.z) * tile.block_heigth) as f32 / 2.0;
         command
             .spawn(init_sprite(
-                map_tile_units.bitmap.clone(),
-                x_c + map_tile_units.offset_x,        // x + tmp.0,
-                y_c * -1.0 + map_tile_units.offset_y, // y + tmp.1,
+                tile.bitmap.clone(),
+                x_c + tile.offset_x,        // x + tmp.0,
+                y_c * -1.0 + tile.offset_y, // y + tmp.1,
                 0.0
             ))
             .insert(TileComponent)

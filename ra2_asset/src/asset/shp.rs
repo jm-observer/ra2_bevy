@@ -1,6 +1,6 @@
 use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD, Engine};
-use bevy::{prelude::*, reflect::TypeUuid};
+use bevy::{prelude::*, reflect::TypeUuid, render::render_resource::TextureFormat};
 use ra2_data::{
     color::{Bitmap, Palette},
     shp::{ShpFile, ShpImage}
@@ -8,7 +8,7 @@ use ra2_data::{
 use std::sync::Arc;
 
 #[derive(TypeUuid, Clone)]
-#[uuid = "2c6acc1a-a6cd-40ff-987b-8d328bb58fda"]
+#[uuid = "1c2d46a6-ee75-4a52-b2e5-a7e7311eae11"]
 pub struct ShpAsset {
     pub name:       String,
     pub height:     i32,
@@ -37,13 +37,14 @@ impl ShpAsset {
         textures: &mut Assets<Image>,
         pal: &Palette,
         texture_atlases: &mut Assets<TextureAtlas>
-    ) -> Handle<TextureAtlas> {
-        let mut texture_atlas_builder = TextureAtlasBuilder::default();
+    ) -> Result<Handle<TextureAtlas>> {
+        let mut texture_atlas_builder =
+            TextureAtlasBuilder::default().format(TextureFormat::Rgba8Unorm);
         let mut first_handle: Option<Handle<Image>> = None;
         let mut inited = true;
         for asset in &self.shp {
             let mut bitmap = asset.data.clone();
-            bitmap.update_from_palette(pal);
+            bitmap.update_from_palette(pal)?;
             let texture = bitmap.into();
             let handle = textures.add(texture);
             let tmp = textures.get(&handle).unwrap();
@@ -60,7 +61,7 @@ impl ShpAsset {
                 .get_texture_index(&first_handle.as_ref().unwrap())
                 .unwrap()
         );
-        texture_atlases.add(texture_atlas)
+        Ok(texture_atlases.add(texture_atlas))
     }
 }
 pub struct ShpImageAsset {

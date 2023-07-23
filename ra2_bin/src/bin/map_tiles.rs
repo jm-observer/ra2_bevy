@@ -49,7 +49,7 @@ fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         printed: false
     });
     let mut orb = Camera2dBundle::default();
-    orb.transform = Transform::from_xyz(0.0, 0.0, 999.9);
+    orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
     commands.spawn(orb);
 }
 
