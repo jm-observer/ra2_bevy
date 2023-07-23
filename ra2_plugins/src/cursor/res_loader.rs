@@ -1,4 +1,4 @@
-use crate::cursor::Cursor;
+use crate::cursor::CursorComponent;
 use bevy::{
     asset::{HandleId, LoadState},
     prelude::*
@@ -63,6 +63,6 @@ pub fn init_cursor(
             texture_atlas: atlas_handle,
             ..Default::default()
         })
-        .insert(Cursor::default());
+        .insert(CursorComponent);
     cursor_shp.init = true;
 }

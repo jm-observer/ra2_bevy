@@ -1,4 +1,4 @@
-use bevy::{app::App, asset::AddAsset};
+use bevy::{app::App, asset::AddAsset, ecs::component::Component};
 use ra2_asset::{
     asset::{IniAsset, MapAsset, ShpAsset, TileAsset},
     loader::{IniFileAssetLoader, MapLoader, PaletteLoader, ShpLoader, TilesAssetLoader},
@@ -19,3 +19,6 @@ pub fn add_assets_and_loaders(app: &mut App) {
         .add_asset_loader(ShpLoader)
         .add_state::<DebugGameState>();
 }
+
+#[derive(Component)]
+pub struct Cursor;

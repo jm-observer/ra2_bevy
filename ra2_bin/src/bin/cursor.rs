@@ -8,7 +8,7 @@ use ra2_asset::{
 };
 use ra2_bin::add_assets_and_loaders;
 use ra2_data::color::Palette;
-use ra2_plugins::cursor::{init_cursor, CursorShp};
+use ra2_plugins::cursor::{init_cursor, CursorComponent, CursorShp};
 use std::env;
 
 fn main() {
@@ -24,6 +24,10 @@ fn main() {
         .add_systems(
             Update,
             check_cursor_init.run_if(in_state(DebugGameState::Loading))
+        )
+        .add_systems(
+            Update,
+            move_mouse_events_system.run_if(in_state(DebugGameState::PlayTime))
         )
         .run();
 }
@@ -46,5 +50,24 @@ fn check_cursor_init(
 ) {
     if cursor_shp.init {
         next_state.set(DebugGameState::PlayTime);
+    }
+}
+
+fn move_mouse_events_system(
+    mut cursor_moved_events: EventReader<CursorMoved>,
+    mut query: Query<&mut Transform, With<CursorComponent>>
+) {
+    let mut direction = Vec3::ZERO;
+    for event in cursor_moved_events.iter() {
+        info!("{:?}", event);
+        direction.x = event.position.x;
+        direction.y = event.position.y;
+    }
+    if direction != Vec3::ZERO {
+        let query = &mut query;
+        for mut transform in query.into_iter() {
+            transform.translation.x = direction.x;
+            transform.translation.y = direction.y;
+        }
     }
 }
