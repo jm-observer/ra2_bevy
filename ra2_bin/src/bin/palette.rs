@@ -2,17 +2,17 @@
 
 use bevy::prelude::*;
 use ra2_asset::{
-    asset::TileAsset,
+    asset::{PaletteAsset, TileAsset},
     loader::{PaletteLoader, TilesAssetLoader}
 };
-use ra2_data::color::Palette;
+use ra2_data::lighting::Lighting;
 use std::env;
 
 fn main() {
     env::set_var("BEVY_ASSET_ROOT", "D:\\git");
     App::new()
         .add_plugins(DefaultPlugins)
-        .add_asset::<Palette>()
+        .add_asset::<PaletteAsset>()
         .add_asset_loader(PaletteLoader)
         .add_systems(Startup, setup)
         .add_systems(Update, print_on_load)
@@ -29,7 +29,7 @@ fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 }
 
-fn print_on_load(mut state: ResMut<CustomRes>, palette_assets: ResMut<Assets<Palette>>) {
+fn print_on_load(mut state: ResMut<CustomRes>, palette_assets: ResMut<Assets<PaletteAsset>>) {
     let palette_asset = palette_assets.get(&state.palette);
     if state.printed {
         return;
@@ -45,6 +45,18 @@ fn print_on_load(mut state: ResMut<CustomRes>, palette_assets: ResMut<Assets<Pal
 
 #[derive(Resource)]
 pub struct CustomRes {
-    pub palette: Handle<Palette>,
+    pub palette: Handle<PaletteAsset>,
     pub printed: bool
+}
+
+fn mp02t2_lighting() -> Lighting {
+    Lighting {
+        level:      0.008,
+        ambient:    0.85,
+        red:        1.0,
+        green:      1.0,
+        blue:       1.10,
+        ground:     0.0,
+        force_tint: true
+    }
 }

@@ -4,23 +4,24 @@ use std::sync::Arc;
 ///照明 灯光 采光 打光
 #[derive(Copy, Clone)]
 pub struct Lighting {
-    pub level:      f32,
-    pub ambient:    f32,
-    pub red:        f32,
-    pub green:      f32,
-    pub blue:       f32,
-    pub ground:     f32,
+    pub level:      f64,
+    pub ambient:    f64,
+    pub red:        f64,
+    pub green:      f64,
+    pub blue:       f64,
+    pub ground:     f64,
+    /// ?
     pub force_tint: bool
 }
 impl Lighting {
     pub fn init() -> Self {
         Lighting {
-            level:      0.0f32,
-            ambient:    1f32,
-            red:        1f32,
-            green:      1f32,
-            blue:       1f32,
-            ground:     0f32,
+            level:      0.032f64,
+            ambient:    1f64,
+            red:        1f64,
+            green:      1f64,
+            blue:       1f64,
+            ground:     0f64,
             force_tint: false
         }
     }
@@ -48,7 +49,7 @@ impl Lighting {
         self.blue = sec.get_number_default(tmp.as_str(), 1.0);
         tmp = pre.clone();
         tmp.push_str("ground");
-        self.ground = sec.get_number_default(tmp.as_str(), 1.0);
+        self.ground = sec.get_number_default(tmp.as_str(), 0.0);
     }
 
     pub fn compute(&self, lighting_type: LightingType, _z: i32) -> Vec3 {
@@ -67,23 +68,23 @@ impl Lighting {
         self.compute(lighting_type, 0)
     }
 
-    pub fn compute_level(&self, lighting_type: LightingType, z: f32) -> f32 {
+    pub fn compute_level(&self, lighting_type: LightingType, z: f64) -> f64 {
         if lighting_type as i32 >= 2 {
-            self.level * (z - 1f32)
+            self.level * (z - 1f64)
         } else {
-            0f32
+            0f64
         }
     }
 
     pub fn compute_tint(&self, lighting_type: LightingType) -> Vec3 {
         if lighting_type as i32 >= 4 || self.force_tint {
-            Vec3::new(self.red, self.green, self.blue)
+            Vec3::new(self.red as f32, self.green as f32, self.blue as f32)
         } else {
             Vec3::new(1.0, 1.0, 1.0)
         }
     }
 
-    pub fn get_ambient_intensity(&self) -> f32 {
+    pub fn get_ambient_intensity(&self) -> f64 {
         self.ambient + self.ground
     }
 }
