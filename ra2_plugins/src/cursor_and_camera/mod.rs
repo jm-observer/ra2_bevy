@@ -1,14 +1,11 @@
-use bevy::{
-    input::mouse::MouseMotion,
-    log::debug,
-    prelude::{
-        info, Component, CursorMoved, EventReader, Input, KeyCode, Query, Res, ResMut, Resource,
-        Transform, Vec3, Window, With
-    }
-};
+mod camera;
+mod window;
 
-#[derive(Component)]
-pub struct Camera;
+use bevy::{
+    prelude::{TextBundle, TextStyle, *}
+};
+pub use camera::*;
+pub use window::*;
 
 #[derive(Debug, Resource, Default)]
 pub struct CursorPosition {
@@ -20,104 +17,125 @@ pub struct CursorPosition {
     on_bottom_edge: bool
 }
 
+pub fn init(mut commands: Commands) {
+    let camera = Camera2dBundle::default();
+    let camera_position = camera.transform.clone();
+    let camaera_position_text = format!(
+        "Camera Positon x: {} y: {} z: {}",
+        camera_position.translation.x, camera_position.translation.y, camera_position.translation.z
+    );
+
+    commands.insert_resource(CursorPosition::default());
+    commands.spawn(camera).insert(Camera);
+    commands
+        .spawn(
+            TextBundle::from_section(
+                camaera_position_text,
+                TextStyle {
+                    font_size: 18.0,
+                    color: Color::WHITE,
+                    ..default()
+                }
+            )
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(10.0),
+                left: Val::Px(10.0),
+                ..default()
+            })
+        )
+        .insert(CameraPositionText);
+
+    window::init(&mut commands);
+}
+
 pub fn update_camera_position_by_cursor(
     position: Res<CursorPosition>,
-    mut camera_position: Query<&mut Transform, With<Camera>>
+    mut events: EventWriter<CameraPositionChangeEvent>
 ) {
-    // let position = position.single();
-    let mut camera_position = camera_position.single_mut();
     if position.on_up_edge
         || position.on_bottom_edge
         || position.on_right_edge
         || position.on_left_edge
     {
+        let mut event = CameraPositionChangeEvent::default();
         if position.on_left_edge {
-            camera_position.translation.x = camera_position.translation.x - 50.0;
+            event.0 = -50.0;
         } else if position.on_right_edge {
-            camera_position.translation.x = camera_position.translation.x + 50.0;
+            event.0 = 50.0;
         }
-
         if position.on_up_edge {
-            camera_position.translation.y = camera_position.translation.y - 50.0;
+            event.1 = -50.0;
         } else if position.on_bottom_edge {
-            camera_position.translation.y = camera_position.translation.y + 50.0;
+            event.1 = 50.0;
         }
-        info!(
-            "x={} y={}",
-            camera_position.translation.x, camera_position.translation.y
-        );
+        events.send(event);
     }
 }
 
 pub fn update_camera_position_by_keyboard(
     input: Res<Input<KeyCode>>,
-    mut query: Query<&mut Transform, With<Camera>>
+    mut events: EventWriter<CameraPositionChangeEvent>
 ) {
-    let query = &mut query;
-    for mut transform in query.into_iter() {
-        let mut direction = Vec3::ZERO;
-        if input.pressed(KeyCode::Left) {
-            direction.x -= 1.0;
-        }
-        if input.pressed(KeyCode::Right) {
-            direction.x += 1.0;
-        }
-        if input.pressed(KeyCode::Up) {
-            direction.y += 1.0;
-        }
-        if input.pressed(KeyCode::Down) {
-            direction.y -= 1.0;
-        }
+    let mut direction = Vec3::ZERO;
+    if input.pressed(KeyCode::Left) {
+        direction.x -= 1.0;
+    }
+    if input.pressed(KeyCode::Right) {
+        direction.x += 1.0;
+    }
+    if input.pressed(KeyCode::Up) {
+        direction.y += 1.0;
+    }
+    if input.pressed(KeyCode::Down) {
+        direction.y -= 1.0;
+    }
 
-        if direction != Vec3::ZERO {
-            info!("{}", direction);
-            transform.translation += direction.normalize() * 100.0;
-        }
+    if direction != Vec3::ZERO {
+        direction = direction.normalize() * 10.0;
+        events.send(CameraPositionChangeEvent(
+            direction.x,
+            direction.y,
+            direction.z
+        ));
     }
 }
 
 pub fn update_cursor_position(
     mut cursor_moved_events: EventReader<CursorMoved>,
-    mut windows: Query<&mut Window>,
+    windows: Query<&Window>,
     mut position: ResMut<CursorPosition>
 ) {
-    if cursor_moved_events.len() > 0 {
-        let window = windows.single();
-        let width = window.physical_width() as f32;
-        let height = window.physical_height() as f32;
+    if cursor_moved_events.len() == 0 {
+        return;
+    }
+    let window = windows.single();
+    let width = window.resolution.width();
+    let height = window.resolution.height();
 
-        for event in cursor_moved_events.iter() {
-            position.x = event.position.x;
-            position.y = event.position.y;
-            info!(
-                "{} {} {} {} {} {}",
-                width,
-                height,
-                window.resolution.width(),
-                window.resolution.height(),
-                position.x,
-                position.y,
-            );
-            if event.position.x == 0.0 {
-                position.on_left_edge = true;
-                position.on_right_edge = false;
-            } else if event.position.x > width - 2.0 {
-                position.on_right_edge = true;
-                position.on_left_edge = false;
-            } else {
-                position.on_right_edge = false;
-                position.on_left_edge = false;
-            }
-            if event.position.y == 0.0 {
-                position.on_up_edge = true;
-                position.on_bottom_edge = false;
-            } else if event.position.y > height - 2.0 {
-                position.on_bottom_edge = true;
-                position.on_up_edge = false;
-            } else {
-                position.on_bottom_edge = false;
-                position.on_up_edge = false;
-            }
+    for event in cursor_moved_events.iter() {
+        position.x = event.position.x;
+        position.y = event.position.y;
+
+        if event.position.x == 0.0 {
+            position.on_left_edge = true;
+            position.on_right_edge = false;
+        } else if event.position.x > width - 2.0 {
+            position.on_right_edge = true;
+            position.on_left_edge = false;
+        } else {
+            position.on_right_edge = false;
+            position.on_left_edge = false;
+        }
+        if event.position.y == 0.0 {
+            position.on_up_edge = true;
+            position.on_bottom_edge = false;
+        } else if event.position.y > height - 2.0 {
+            position.on_bottom_edge = true;
+            position.on_up_edge = false;
+        } else {
+            position.on_bottom_edge = false;
+            position.on_up_edge = false;
         }
     }
 }
