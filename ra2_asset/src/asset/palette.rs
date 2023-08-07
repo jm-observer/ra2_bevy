@@ -1,9 +1,6 @@
-use crate::color::RaColor;
-use anyhow::{bail, Result};
-use bevy::{log::error, reflect::TypeUuid};
-use serde_json::Value;
+use bevy::reflect::{TypePath, TypeUuid};
 
-#[derive(Clone, Debug, TypeUuid, Default)]
+#[derive(Clone, Debug, TypeUuid, Default, TypePath)]
 #[uuid = "3c047c2f-2173-44f5-bdfd-c3087c8d89e2"]
 pub struct PaletteAsset {
     //调色板

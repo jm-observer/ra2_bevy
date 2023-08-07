@@ -34,22 +34,22 @@ impl Lighting {
         let pre = pre.to_string();
         let mut tmp = pre.clone();
         tmp.push_str("level");
-        self.level = sec.get_number_default(tmp.as_str(), 0.032);
+        self.level = sec.get_number_default(tmp.as_str(), 0.032) as f64;
         tmp = pre.clone();
         tmp.push_str("ambient");
-        self.ambient = sec.get_number_default(tmp.as_str(), 1.0);
+        self.ambient = sec.get_number_default(tmp.as_str(), 1.0) as f64;
         tmp = pre.clone();
         tmp.push_str("red");
-        self.red = sec.get_number_default(tmp.as_str(), 1.0);
+        self.red = sec.get_number_default(tmp.as_str(), 1.0) as f64;
         tmp = pre.clone();
         tmp.push_str("green");
-        self.green = sec.get_number_default(tmp.as_str(), 1.0);
+        self.green = sec.get_number_default(tmp.as_str(), 1.0) as f64;
         tmp = pre.clone();
         tmp.push_str("blue");
-        self.blue = sec.get_number_default(tmp.as_str(), 1.0);
+        self.blue = sec.get_number_default(tmp.as_str(), 1.0) as f64;
         tmp = pre.clone();
         tmp.push_str("ground");
-        self.ground = sec.get_number_default(tmp.as_str(), 0.0);
+        self.ground = sec.get_number_default(tmp.as_str(), 0.0) as f64;
     }
 
     pub fn compute(&self, lighting_type: LightingType, _z: i32) -> Vec3 {

@@ -1,5 +1,6 @@
 use crate::{color::RaColor, lighting::Lighting};
 use bevy::reflect::TypeUuid;
+use ra2_data::{color::RaColor, lighting::Lighting};
 
 #[derive(Clone, Debug, TypeUuid, Default)]
 #[uuid = "3c047c2f-2173-44f5-bdfd-c3087c8d89e2"]
@@ -51,19 +52,7 @@ impl IsoPalettes {
                 colors[i] = RaColor::from_rgb(r, g, b);
             }
         }
-        todo!()
-        // let len = val.len() / 3 as usize;
-        // let mut colors = Vec::<RaColor>::with_capacity(256);
-        // let mut index = 0;
-        // while index < len {
-        //     colors.push(RaColor::from_rgb(
-        //         4 * val[3 * index],
-        //         4 * val[3 * index + 1],
-        //         4 * val[3 * index + 2]
-        //     ));
-        //     index += 1;
-        // }
-        // IsoPalettes { colors }
+        Self { palettes }
     }
 }
 

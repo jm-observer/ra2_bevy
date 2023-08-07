@@ -1,10 +1,7 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
 use bevy::prelude::*;
-use ra2_asset::{
-    asset::{PaletteAsset, TileAsset},
-    loader::{PaletteLoader, TilesAssetLoader}
-};
+use ra2_asset::{asset::PaletteAsset, loader::PaletteLoader};
 use ra2_data::lighting::Lighting;
 use std::env;
 

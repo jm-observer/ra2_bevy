@@ -1,3 +1,4 @@
+use crate::asset::PaletteAsset;
 use bevy::{
     asset::{AssetLoader, LoadedAsset},
     log::error

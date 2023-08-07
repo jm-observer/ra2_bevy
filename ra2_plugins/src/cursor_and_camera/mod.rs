@@ -1,10 +1,6 @@
-use bevy::{
-    input::mouse::MouseMotion,
-    log::debug,
-    prelude::{
-        info, Component, CursorMoved, EventReader, Input, KeyCode, Query, Res, ResMut, Resource,
-        Transform, Vec3, Window, With
-    }
+use bevy::prelude::{
+    info, Component, CursorMoved, EventReader, Input, KeyCode, Query, Res, ResMut, Resource,
+    Transform, Vec3, Window, With
 };
 
 #[derive(Component)]
@@ -78,7 +74,7 @@ pub fn update_camera_position_by_keyboard(
 
 pub fn update_cursor_position(
     mut cursor_moved_events: EventReader<CursorMoved>,
-    mut windows: Query<&mut Window>,
+    windows: Query<&mut Window>,
     mut position: ResMut<CursorPosition>
 ) {
     if cursor_moved_events.len() > 0 {

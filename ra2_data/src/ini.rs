@@ -11,19 +11,19 @@ use std::{
 
 pub trait IniSectionTrait {
     fn get_string(&self, key: &str) -> String;
-    fn get_number(&self, key: &str) -> f64;
-    fn get_number_default(&self, key: &str, default: f64) -> f64;
+    fn get_number(&self, key: &str) -> f32;
+    fn get_number_default(&self, key: &str, default: f32) -> f32;
 }
 impl IniSectionTrait for RwLock<IniSection> {
     fn get_string(&self, key: &str) -> String {
         self.read().unwrap().get_string(key)
     }
 
-    fn get_number(&self, key: &str) -> f64 {
+    fn get_number(&self, key: &str) -> f32 {
         self.read().unwrap().get_number(key)
     }
 
-    fn get_number_default(&self, key: &str, default: f64) -> f64 {
+    fn get_number_default(&self, key: &str, default: f32) -> f32 {
         self.read().unwrap().get_number_default(key, default)
     }
 }
@@ -94,9 +94,9 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_f64_from_str_option(&self, key: &str) -> Option<f64> {
+    pub fn get_number_f32_from_str_option(&self, key: &str) -> Option<f32> {
         if let Some(val) = self.get_string_option(key) {
-            let Ok(res) = val.parse::<f64>() else {
+            let Ok(res) = val.parse::<f32>() else {
                 error!("parse f64 fail: key={:?} {}", key, val);
                 return None;
             };
@@ -123,9 +123,18 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_f64_from_str(&self, key: &str) -> f64 {
-        if let Some(val) = self.get_number_f64_from_str_option(key) {
+    pub fn get_number_f32_from_str(&self, key: &str) -> f32 {
+        if let Some(val) = self.get_number_f32_from_str_option(key) {
             val
+        } else {
+            error!("no key={}", key);
+            0.0
+        }
+    }
+
+    pub fn get_number_f64_from_str(&self, key: &str) -> f64 {
+        if let Some(val) = self.get_number_f32_from_str_option(key) {
+            val as f64
         } else {
             error!("no key={}", key);
             0.0
@@ -140,12 +149,12 @@ impl IniSection {
         self.get_string_result(key).unwrap_or(default.to_string())
     }
 
-    pub fn get_number_option(&self, key: &str) -> Option<f64> {
+    pub fn get_number_option(&self, key: &str) -> Option<f32> {
         if let Some(val) = self.entries.get(key) {
             if let Some(val) = val.as_f64() {
-                Some(val as f64)
+                Some(val as f32)
             } else if let Some(val) = val.as_str() {
-                if let Ok(res) = val.parse::<f64>() {
+                if let Ok(res) = val.parse::<f32>() {
                     Some(res)
                 } else {
                     warn!("error key={:?}", key);
@@ -159,7 +168,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number_default(&self, key: &str, default: f64) -> f64 {
+    pub fn get_number_default(&self, key: &str, default: f32) -> f32 {
         if let Some(val) = self.get_number_option(key) {
             val
         } else {
@@ -167,7 +176,7 @@ impl IniSection {
         }
     }
 
-    pub fn get_number(&self, key: &str) -> f64 {
+    pub fn get_number(&self, key: &str) -> f32 {
         if let Some(val) = self.get_number_option(key) {
             val
         } else {
@@ -273,12 +282,12 @@ impl IniSection {
         default
     }
 
-    pub fn get_number_array_defalut(&self, key: &str) -> Vec<f64> {
+    pub fn get_number_array_defalut(&self, key: &str) -> Vec<f32> {
         self.get_number_array(key, DEFAULT_REGEX)
             .unwrap_or(Vec::new())
     }
 
-    pub fn get_number_array(&self, key: &str, regex: &str) -> Result<Vec<f64>> {
+    pub fn get_number_array(&self, key: &str, regex: &str) -> Result<Vec<f32>> {
         let n = self.get_string_option(key);
         let mut res = Vec::new();
         if let Some(n) = n {
@@ -286,11 +295,11 @@ impl IniSection {
             let regex_tmp = regex::Regex::new(GET_NUMBER_ARRAY_REGEX)?;
             let rs = split_by_regex(n, regex)?;
             for r in rs {
-                let t: f64 = if regex_tmp.is_match(r.as_str()) {
+                let t: f32 = if regex_tmp.is_match(r.as_str()) {
                     let r = r.replace("%", "");
-                    r.parse::<f64>()? / 100f64
+                    r.parse::<f32>()? / 100f32
                 } else {
-                    r.parse::<f64>()?
+                    r.parse::<f32>()?
                 };
                 res.push(t);
             }
