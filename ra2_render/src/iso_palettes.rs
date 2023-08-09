@@ -1,4 +1,3 @@
-use crate::{color::RaColor, lighting::Lighting};
 use bevy::reflect::TypeUuid;
 use ra2_data::{color::RaColor, lighting::Lighting};
 
