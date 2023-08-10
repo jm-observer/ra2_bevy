@@ -1,13 +1,11 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
-use bevy::{
-    prelude::*
-};
+use bevy::prelude::*;
 use ra2_asset::{
-    asset::{TileAsset},
+    asset::TileAsset,
     loader::{PaletteLoader, TilesAssetLoader}
 };
-use ra2_data::color::{Palette};
+use ra2_data::color::Palette;
 
 fn main() {
     App::new()
@@ -26,7 +24,7 @@ fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
 
-    let tile = assert_server.load("../../resource/clat01.tile");
+    let tile = assert_server.load("../../resource/Cliff32.tile");
 
     let palette = assert_server.load("../../resource/isotem.pal");
 
@@ -40,7 +38,7 @@ fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
 
 fn print_on_load(
     mut commands: Commands,
-    state: ResMut<CustomRes>,
+    mut state: ResMut<CustomRes>,
     tile_assets: ResMut<Assets<TileAsset>>,
     palette_assets: ResMut<Assets<Palette>>,
     mut asset_textures: ResMut<Assets<Image>>
@@ -53,6 +51,9 @@ fn print_on_load(
     let (Some(asset), Some(palette)) = (tile_asset, palette_asset) else {
         return;
     };
+    for (index, color) in palette.colors.iter().enumerate() {
+        println!("index {}: {}, {}, {}", index, color.b, color.g, color.r)
+    }
     let image = asset
         .images
         .iter()
@@ -66,6 +67,7 @@ fn print_on_load(
         texture: image,
         ..default()
     });
+    state.printed = true;
 }
 
 #[derive(Resource)]

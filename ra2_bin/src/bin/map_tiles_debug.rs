@@ -8,7 +8,7 @@ use ra2_asset::{
 };
 use ra2_bin::add_assets_and_loaders;
 use ra2_data::{color::Palette, rule::GeneralRules};
-use ra2_plugins::cursor::{init_cursor, CursorShp};
+use ra2_plugins::cursor_keyboard_camera::CameraChangePlugin;
 use ra2_render::{
     data::map::{MapTileCollection, TileCollection},
     system::map::create_map_tile_sprites
@@ -18,23 +18,11 @@ use std::{collections::HashMap, env, sync::Arc};
 fn main() {
     env::set_var("BEVY_ASSET_ROOT", "D:\\git");
     let mut app = App::new();
-    app.add_plugins(DefaultPlugins);
+    app.add_plugins(DefaultPlugins)
+        .add_plugin(CameraChangePlugin);
     add_assets_and_loaders(&mut app);
     app.add_systems(Startup, setup)
         .add_systems(Update, print_on_load)
-        .add_systems(
-            Update,
-            init_cursor.run_if(in_state(DebugGameState::Loading))
-        )
-        .add_systems(
-            Update,
-            ra2_bin::check_cursor_init.run_if(in_state(DebugGameState::Loading))
-        )
-        .add_systems(
-            Update,
-            ra2_bin::move_mouse_events_system.run_if(in_state(DebugGameState::PlayTime))
-        )
-        .add_systems(Update, ra2_bin::listen_keyboard)
         .run();
 }
 
@@ -61,13 +49,9 @@ fn setup(
         temperate_ini,
         printed: false
     });
-    let mut orb = Camera2dBundle::default();
-    orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
-    commands.spawn(orb).insert(ra2_bin::Camera);
-
-    let cursor = CursorShp::new(&asset_server);
-    commands.insert_resource(cursor);
-
+    // let mut orb = Camera2dBundle::default();
+    // orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
+    // commands.spawn(orb).insert(ra2_bin::Camera);
     next_state.set(DebugGameState::Loading);
 }
 
