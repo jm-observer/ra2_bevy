@@ -3,9 +3,12 @@
 use bevy::{asset::LoadState, prelude::*};
 use ra2_asset::{
     asset::{IniAsset, MapAsset, TileAsset, TileTexture},
-    loader::{IniFileAssetLoader, MapLoader, PaletteLoader, TilesAssetLoader}
+    loader::{IniFileAssetLoader, MapLoader, PaletteLoader, TilesAssetLoader},
+    DebugGameState
 };
+use ra2_bin::add_assets_and_loaders;
 use ra2_data::{color::Palette, rule::GeneralRules};
+use ra2_plugins::cursor_keyboard_camera::CameraChangePlugin;
 use ra2_render::{
     data::map::{MapTileCollection, TileCollection},
     system::map::create_map_tile_sprites
@@ -14,23 +17,21 @@ use std::{collections::HashMap, env, sync::Arc};
 
 fn main() {
     env::set_var("BEVY_ASSET_ROOT", "D:\\git");
-    App::new()
-        .add_plugins(DefaultPlugins)
-        .add_asset::<MapAsset>()
-        .add_asset::<Palette>()
-        .add_asset::<TileAsset>()
-        .add_asset::<IniAsset>()
-        .add_asset_loader(PaletteLoader)
-        .add_asset_loader(MapLoader)
-        .add_asset_loader(TilesAssetLoader)
-        .add_asset_loader(IniFileAssetLoader)
-        .add_systems(Startup, setup)
+    let mut app = App::new();
+    app.add_plugins(DefaultPlugins)
+        .add_plugin(CameraChangePlugin);
+    add_assets_and_loaders(&mut app);
+    app.add_systems(Startup, setup)
         .add_systems(Update, print_on_load)
         .run();
 }
 
 /// set up a simple 3D scene
-fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
+fn setup(
+    mut commands: Commands,
+    asset_server: ResMut<AssetServer>,
+    mut next_state: ResMut<NextState<DebugGameState>>
+) {
     let palette = asset_server.load("palettes/isotem.pal");
     let tiles = asset_server.load_folder("tile/tiles.tem").unwrap();
     let temperate_ini = asset_server
@@ -48,9 +49,10 @@ fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         temperate_ini,
         printed: false
     });
-    let mut orb = Camera2dBundle::default();
-    orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
-    commands.spawn(orb);
+    // let mut orb = Camera2dBundle::default();
+    // orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
+    // commands.spawn(orb).insert(ra2_bin::Camera);
+    next_state.set(DebugGameState::Loading);
 }
 
 fn print_on_load(

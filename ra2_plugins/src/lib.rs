@@ -1,2 +1,2 @@
 // pub mod cursor;
-pub mod cursor_and_camera;
+pub mod cursor_keyboard_camera;

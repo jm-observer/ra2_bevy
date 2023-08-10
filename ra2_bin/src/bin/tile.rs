@@ -2,16 +2,12 @@
 
 use bevy::prelude::*;
 use ra2_asset::{
-    asset::{PaletteAsset, TileAsset},
+    asset::TileAsset,
     loader::{PaletteLoader, TilesAssetLoader}
 };
-use ra2_bin::mp02t2_lighting;
-use ra2_data::color::IsoPalettes;
-use std::env;
+use ra2_data::color::Palette;
 
 fn main() {
-    env::set_var("BEVY_ASSET_ROOT", "D:\\git");
-
     App::new()
         .add_plugins(DefaultPlugins)
         .add_asset::<TileAsset>()
@@ -28,9 +24,9 @@ fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
     // let vxl = assert_server.load("vxl/1tnk.vxl");
     // let vxl = assert_server.load("vxl/1tnkbarl.vxl");
 
-    let tile = assert_server.load("tile/tiles.tem/Cliff28.tile");
+    let tile = assert_server.load("../../resource/Cliff32.tile");
 
-    let palette = assert_server.load("palettes/isotem.pal");
+    let palette = assert_server.load("../../resource/isotem.pal");
 
     commands.insert_resource(CustomRes {
         tile,
@@ -42,9 +38,9 @@ fn setup(mut commands: Commands, assert_server: ResMut<AssetServer>) {
 
 fn print_on_load(
     mut commands: Commands,
-    state: ResMut<CustomRes>,
+    mut state: ResMut<CustomRes>,
     tile_assets: ResMut<Assets<TileAsset>>,
-    palette_assets: ResMut<Assets<PaletteAsset>>,
+    palette_assets: ResMut<Assets<Palette>>,
     mut asset_textures: ResMut<Assets<Image>>
 ) {
     let tile_asset = tile_assets.get(&state.tile);
@@ -55,6 +51,24 @@ fn print_on_load(
     let (Some(asset), Some(palette)) = (tile_asset, palette_asset) else {
         return;
     };
+    for (index, color) in palette.colors.iter().enumerate() {
+        println!("index {}: {}, {}, {}", index, color.b, color.g, color.r)
+    }
+    let image = asset
+        .images
+        .iter()
+        .map(|x| {
+            let bitmap: Image = x.indexed_to_rgba(&palette).unwrap().into();
+            asset_textures.add(bitmap)
+        })
+        .collect::<Vec<Handle<Image>>>()
+        .remove(0);
+    commands.spawn(SpriteBundle {
+        texture: image,
+        ..default()
+    });
+    state.printed = true;
+
 
     let lighting = mp02t2_lighting();
 
@@ -78,12 +92,6 @@ fn print_on_load(
 
     let palette = palettes.palettes[0];
     let images = asset
-        .images
-        .iter()
-        .map(|x| {
-            let bitmap: Image = x.indexed_to_rgba(&palette).unwrap().into();
-            asset_textures.add(bitmap)
-        })
         .collect::<Vec<Handle<Image>>>();
     for (index, image) in images.into_iter().enumerate() {
         commands.spawn(SpriteBundle {

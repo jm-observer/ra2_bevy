@@ -34,13 +34,23 @@ pub fn create_map_tile_sprites(command: &mut Commands, tiles: Arc<MapTileCollect
         let i = tile.tile_num;
         let n = tiles.tile_sets.get_tile(i);
 
+        // Point offset = new Point(tile.Dx * tmp.BlockWidth / 2, (tile.Dy - tile.Z) *
+        // tmp.BlockHeight / 2);
+
         let x_c = (tile.dx * tile.block_width) as f32 / 2.0;
         let y_c = ((tile.dy - tile.z) * tile.block_heigth) as f32 / 2.0;
+        if n.name.starts_with("Cliff32") {
+            println!(
+                "Drawing TMP file {0} (subtile {1}) at ({2},{3})",
+                n.name, tile.tile_num, x_c, y_c
+            );
+        }
+
         command
             .spawn(init_sprite(
                 tile.bitmap.clone(),
-                x_c + tile.offset_x,        // x + tmp.0,
-                y_c * -1.0 + tile.offset_y, // y + tmp.1,
+                x_c,        // x + tmp.0,
+                y_c * -1.0, // y + tmp.1,
                 0.0
             ))
             .insert(TileComponent)
@@ -50,7 +60,7 @@ pub fn create_map_tile_sprites(command: &mut Commands, tiles: Arc<MapTileCollect
 }
 
 fn init_sprite(bitmap: Handle<Image>, x: f32, y: f32, z: f32) -> SpriteBundle {
-    info!("{} {} {}", x, y, z);
+    // info!("{} {} {}", x, y, z);
     SpriteBundle {
         transform: Transform::from_xyz(x, y, z),
         texture: bitmap,
