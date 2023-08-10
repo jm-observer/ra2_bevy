@@ -3,6 +3,8 @@ use bevy::prelude::*;
 #[derive(Default)]
 pub struct CameraPositionChangeEvent(pub f32, pub f32, pub f32);
 
+impl Event for CameraPositionChangeEvent {}
+
 #[derive(Component)]
 pub struct Camera;
 #[derive(Component)]

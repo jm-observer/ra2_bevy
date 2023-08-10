@@ -14,7 +14,5 @@ fn main() {
     //     }),
     //     ..default()
     // }));
-    app.add_plugins(DefaultPlugins)
-        .add_plugin(CameraChangePlugin)
-        .run();
+    app.add_plugins((DefaultPlugins, CameraChangePlugin)).run();
 }
