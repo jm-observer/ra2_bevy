@@ -2,8 +2,8 @@
 
 use bevy::prelude::*;
 use ra2_asset::{asset::PaletteAsset, loader::PaletteLoader};
-use ra2_data::lighting::Lighting;
-use ra2_render::iso_palettes::IsoPalettes;
+use ra2_bin::mp02t2_lighting;
+use ra2_data::color::IsoPalettes;
 use std::env;
 
 fn main() {
@@ -70,18 +70,6 @@ fn print_on_load(mut state: ResMut<CustomRes>, palette_assets: ResMut<Assets<Pal
 pub struct CustomRes {
     pub palette: Handle<PaletteAsset>,
     pub printed: bool
-}
-
-fn mp02t2_lighting() -> Lighting {
-    Lighting {
-        level:      0.008,
-        ambient:    0.85,
-        red:        1.0,
-        green:      1.0,
-        blue:       1.10,
-        ground:     0.0,
-        force_tint: true
-    }
 }
 
 const LEVEL1: [[u8; 3]; 256] = [

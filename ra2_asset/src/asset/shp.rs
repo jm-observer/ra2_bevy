@@ -48,7 +48,7 @@ impl ShpAsset {
         let mut inited = true;
         for asset in &self.shp {
             let mut bitmap = asset.data.clone();
-            bitmap.update_from_palette(pal)?;
+            bitmap.update_from_palette(&pal.colors)?;
             let texture = bitmap.into();
             let handle = textures.add(texture);
             let tmp = textures.get(&handle).unwrap();

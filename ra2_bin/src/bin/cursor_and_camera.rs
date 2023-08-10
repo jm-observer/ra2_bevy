@@ -1,13 +1,6 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
-use bevy::{asset::LoadState, prelude::*, window::WindowMode};
-use ra2_asset::{
-    asset::{IniAsset, ShpAsset, TileAsset},
-    loader::{IniFileAssetLoader, PaletteLoader, TilesAssetLoader},
-    DebugGameState
-};
-use ra2_bin::add_assets_and_loaders;
-use ra2_data::color::Palette;
+use bevy::{prelude::*, window::WindowMode};
 use ra2_plugins::cursor_and_camera::{
     update_camera_position_by_cursor, update_camera_position_by_keyboard, update_cursor_position,
     Camera, CursorPosition

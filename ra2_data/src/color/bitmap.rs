@@ -1,4 +1,7 @@
-use crate::{color::Palette, coord::Coord};
+use crate::{
+    color::{IsoPalette, Palette, RaColor},
+    coord::Coord
+};
 use anyhow::{bail, Result};
 use bevy::{
     prelude::Image,
@@ -98,7 +101,7 @@ impl Bitmap {
         Self::bitmap(width, height, PixelFormat::Rgba)
     }
 
-    pub fn indexed_to_rgba(&self, palette: &Palette) -> Result<Self> {
+    pub fn indexed_to_rgba(&self, palette: &IsoPalette) -> Result<Self> {
         if !matches!(self.pixel_format, PixelFormat::Indexed) {
             bail!("!matches!(self.pixel_format, PixelFormat::Indexed)");
         }
@@ -106,7 +109,7 @@ impl Bitmap {
         let mut bitmap = Self::rgba_bitmap(self.width, self.height);
         //debug_draw_indexed_image
         bitmap.draw_indexed_image(self, 0, 0);
-        bitmap.update_from_palette(palette)?;
+        bitmap.update_from_palette(&palette.colors)?;
         Ok(bitmap)
     }
 
@@ -119,7 +122,7 @@ impl Bitmap {
         writer.write_image_data(datas).unwrap();
     }
 
-    pub fn update_from_palette(&mut self, palette: &Palette) -> Result<()> {
+    pub fn update_from_palette(&mut self, colors: &[RaColor]) -> Result<()> {
         match self.pixel_format {
             PixelFormat::Indexed => {
                 bail!("PixelFormat::Indexed should not be update_from_palette");
@@ -136,7 +139,7 @@ impl Bitmap {
                     tmp = array[index] as usize;
                     // palette_index = (tmp * interval) as usize;
                     if tmp > 0 {
-                        let color = palette.colors[tmp];
+                        let color = colors[tmp];
                         array[index] = color.r;
                         array[index + 1] = color.g;
                         array[index + 2] = color.b;

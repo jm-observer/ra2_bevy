@@ -51,19 +51,7 @@ impl IsoPalettes {
                 colors[i] = RaColor::from_rgb(r, g, b);
             }
         }
-        todo!()
-        // let len = val.len() / 3 as usize;
-        // let mut colors = Vec::<RaColor>::with_capacity(256);
-        // let mut index = 0;
-        // while index < len {
-        //     colors.push(RaColor::from_rgb(
-        //         4 * val[3 * index],
-        //         4 * val[3 * index + 1],
-        //         4 * val[3 * index + 2]
-        //     ));
-        //     index += 1;
-        // }
-        // IsoPalettes { colors }
+        Self { palettes }
     }
 }
 

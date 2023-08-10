@@ -191,13 +191,13 @@ impl TileImage {
         }
     }
 
-    fn draw_extra_data(&self, t: &mut Bitmap) {
+    fn draw_extra_data(&self, bitmap: &mut Bitmap) {
         if !self.has_extra_data {
             return;
         }
-        let i = t.data.as_mut_slice();
-        let n_width = t.width;
-        let s_height = t.height;
+        let i = bitmap.data.as_mut_slice();
+        let n_width = bitmap.width;
+        let s_height = bitmap.height;
         let r_x_max = 0.max(self.extra_x - self.x as i32) as usize;
         let a = n_width as usize;
         let all_pixel_amount = (n_width * s_height) as usize;
