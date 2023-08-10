@@ -97,8 +97,8 @@ impl IniSection {
     pub fn get_number_f32_from_str_option(&self, key: &str) -> Option<f32> {
         if let Some(val) = self.get_string_option(key) {
             let Ok(res) = val.parse::<f32>() else {
-                error!("parse f32 fail: key={:?} {}", key, val);
-                return None
+                error!("parse f64 fail: key={:?} {}", key, val);
+                return None;
             };
             Some(res)
         } else {
@@ -126,6 +126,15 @@ impl IniSection {
     pub fn get_number_f32_from_str(&self, key: &str) -> f32 {
         if let Some(val) = self.get_number_f32_from_str_option(key) {
             val
+        } else {
+            error!("no key={}", key);
+            0.0
+        }
+    }
+
+    pub fn get_number_f64_from_str(&self, key: &str) -> f64 {
+        if let Some(val) = self.get_number_f32_from_str_option(key) {
+            val as f64
         } else {
             error!("no key={}", key);
             0.0
@@ -193,13 +202,12 @@ impl IniSection {
                 Some(tmp as i32)
             } else {
                 let Some(tmp) = res.as_str() else {
-
                     return None;
                 };
 
                 let Ok(res) = tmp.parse::<i32>() else {
                     error!("parse fail: key={:?} {}", key, tmp);
-                    return None
+                    return None;
                 };
                 Some(res)
             }
@@ -303,11 +311,13 @@ impl IniSection {
     pub fn get_enum(&self, e: &str, enums: impl GetEnum, no_case: bool) -> i32 {
         let s = self.get_string_option(e);
         if let Some(s) = s {
-            let Some( val) = enums.get_num_by_str(s.as_str())else  {
+            let Some(val) = enums.get_num_by_str(s.as_str()) else {
                 return if no_case {
-                    enums.get_num_by_lowercase_str(s.as_str()).unwrap_or(enums.get_num())
+                    enums
+                        .get_num_by_lowercase_str(s.as_str())
+                        .unwrap_or(enums.get_num())
                 } else {
-                     enums.get_num()
+                    enums.get_num()
                 };
             };
             val
@@ -393,7 +403,7 @@ impl IniFile {
                     for (key, val) in map {
                         let Some(val) = val else {
                             warn!("key {} is none", key);
-                            continue
+                            continue;
                         };
                         tmp.set(key, val);
                     }
@@ -409,8 +419,7 @@ impl IniFile {
 
     pub fn get_or_create_section(&mut self, key: &str) -> Arc<IniSection> {
         let Some(section) = self.sections.get(key) else {
-            let tmp =
-                Arc::new(IniSection::new_empty(key.to_string()));
+            let tmp = Arc::new(IniSection::new_empty(key.to_string()));
             self.sections.insert(key.to_string(), tmp.clone());
             return tmp;
         };

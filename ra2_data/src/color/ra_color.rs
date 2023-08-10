@@ -12,6 +12,12 @@ const T: [f32; 16] = [
     63.0, 59.0, 55.0, 52.0, 48.0, 44.0, 41.0, 37.0, 33.0, 30.0, 26.0, 22.0, 19.0, 15.0, 11.0, 8.0
 ];
 
+impl Default for RaColor {
+    fn default() -> Self {
+        Self { r: 0, g: 0, b: 0 }
+    }
+}
+
 impl RaColor {
     pub fn new(r: u8, g: u8, b: u8) -> Self {
         RaColor { r, g, b }

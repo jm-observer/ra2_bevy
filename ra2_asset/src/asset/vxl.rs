@@ -1,7 +1,10 @@
-use bevy::{prelude::*, reflect::TypeUuid};
+use bevy::{
+    prelude::*,
+    reflect::{TypePath, TypeUuid}
+};
 use ra2_data::vxl::{Section, SectionOrigin, Span, Voxel, VxlFileOrigin};
 
-#[derive(Clone, Debug, TypeUuid, Default)]
+#[derive(Clone, Debug, TypeUuid, Default, TypePath)]
 #[uuid = "d814dd88-474e-429d-b4d4-de4d9d1dec6e"]
 pub struct VxlFile {
     pub name:     String,

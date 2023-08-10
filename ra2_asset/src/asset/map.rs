@@ -1,8 +1,11 @@
-use bevy::{prelude::*, reflect::TypeUuid};
+use bevy::{
+    prelude::*,
+    reflect::{TypePath, TypeUuid}
+};
 use ra2_data::map::MapFile;
 use std::{ops::Deref, sync::Arc};
 
-#[derive(TypeUuid, Clone, Resource)]
+#[derive(TypeUuid, Clone, Resource, TypePath)]
 #[uuid = "2b9f3349-8a0f-4b37-bb76-82c0c48a3f3e"]
 pub struct MapAsset(pub(crate) Arc<MapFile>);
 

@@ -1,13 +1,17 @@
 use anyhow::Result;
 use base64::{engine::general_purpose::STANDARD, Engine};
-use bevy::{prelude::*, reflect::TypeUuid, render::render_resource::TextureFormat};
+use bevy::{
+    prelude::*,
+    reflect::{TypePath, TypeUuid},
+    render::render_resource::TextureFormat
+};
 use ra2_data::{
     color::{Bitmap, Palette},
     shp::{ShpFile, ShpImage}
 };
 use std::sync::Arc;
 
-#[derive(TypeUuid, Clone)]
+#[derive(TypeUuid, Clone, TypePath)]
 #[uuid = "1c2d46a6-ee75-4a52-b2e5-a7e7311eae11"]
 pub struct ShpAsset {
     pub name:       String,

@@ -1,4 +1,7 @@
-use bevy::{prelude::*, reflect::TypeUuid};
+use bevy::{
+    prelude::*,
+    reflect::{TypePath, TypeUuid}
+};
 use ra2_data::{color::Bitmap, tile::TileFile};
 use std::sync::Arc;
 
@@ -10,7 +13,7 @@ pub struct TileTexture {
     pub images: Vec<Handle<Image>>
 }
 
-#[derive(TypeUuid, Clone)]
+#[derive(TypeUuid, Clone, TypePath)]
 #[uuid = "b5e27e07-6a34-4af9-bed8-189b7af170ef"]
 pub struct TileAsset {
     pub name:   String,
