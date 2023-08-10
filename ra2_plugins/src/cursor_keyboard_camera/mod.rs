@@ -7,16 +7,22 @@ pub use camera::*;
 pub use cursor_keyboard::*;
 pub use window::*;
 
+/// 1. 计算、展示鼠标的相对坐标（相对显示屏），坐标
+/// 2. 计算、更新、展示相机的坐标
+/// 3. 展示显示屏的分辨率
 pub struct CameraChangePlugin;
 
 impl Plugin for CameraChangePlugin {
     fn build(&self, app: &mut App) {
         app.add_event::<CameraPositionChangeEvent>()
+            .add_event::<CursorPositionChangeEvent>()
             .add_systems(Startup, init)
-            .add_systems(Update, update_cursor_position)
+            .add_systems(Update, update_cursor_relative_position)
             .add_systems(Update, update_camera_position_by_cursor)
             .add_systems(Update, update_camera_position_by_keyboard)
             .add_systems(Update, on_create_system)
+            .add_systems(Update, on_resize_system)
+            .add_systems(Update, update_cursor_position)
             .add_systems(Update, update_camera_position);
     }
 }
@@ -29,6 +35,7 @@ pub fn init(mut commands: Commands) {
         camera_position.translation.x, camera_position.translation.y, camera_position.translation.z
     );
 
+    commands.insert_resource(CursorRelativePosition::default());
     commands.insert_resource(CursorPosition::default());
     commands.spawn(camera).insert(Camera);
     commands
@@ -51,4 +58,5 @@ pub fn init(mut commands: Commands) {
         .insert(CameraPositionText);
 
     window::init(&mut commands);
+    cursor_keyboard::init(&mut commands);
 }

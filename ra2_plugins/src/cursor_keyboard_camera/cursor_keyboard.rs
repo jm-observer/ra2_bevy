@@ -1,14 +1,9 @@
 use crate::cursor_keyboard_camera::CameraPositionChangeEvent;
-use bevy::{
-    input::Input,
-    math::Vec3,
-    prelude::{
-        CursorMoved, EventReader, EventWriter, KeyCode, Query, Res, ResMut, Resource, Window
-    }
-};
+use bevy::{input::Input, math::Vec3, prelude::*};
 
+/// 鼠标的相对window的位置，左上角为（0,0），左手坐标系
 #[derive(Debug, Resource, Default)]
-pub struct CursorPosition {
+pub struct CursorRelativePosition {
     x:              f32,
     y:              f32,
     on_left_edge:   bool,
@@ -17,8 +12,40 @@ pub struct CursorPosition {
     on_bottom_edge: bool
 }
 
+/// 鼠标的坐标
+#[derive(Debug, Resource, Default)]
+pub struct CursorPosition(Vec2);
+
+#[derive(Default, Event)]
+pub struct CursorPositionChangeEvent;
+
+#[derive(Component)]
+pub struct CursorPositionText;
+
+pub fn init(commands: &mut Commands) {
+    let window_text = "Cursor Position:".to_string();
+    commands
+        .spawn(
+            TextBundle::from_section(
+                window_text,
+                TextStyle {
+                    font_size: 18.0,
+                    color: Color::WHITE,
+                    ..default()
+                }
+            )
+            .with_style(Style {
+                position_type: PositionType::Absolute,
+                bottom: Val::Px(70.0),
+                left: Val::Px(10.0),
+                ..default()
+            })
+        )
+        .insert(CursorPositionText);
+}
+
 pub fn update_camera_position_by_cursor(
-    position: Res<CursorPosition>,
+    position: Res<CursorRelativePosition>,
     mut events: EventWriter<CameraPositionChangeEvent>
 ) {
     if position.on_up_edge
@@ -69,10 +96,11 @@ pub fn update_camera_position_by_keyboard(
     }
 }
 
-pub fn update_cursor_position(
+pub fn update_cursor_relative_position(
     mut cursor_moved_events: EventReader<CursorMoved>,
     windows: Query<&Window>,
-    mut position: ResMut<CursorPosition>
+    mut position: ResMut<CursorRelativePosition>,
+    mut events: EventWriter<CursorPositionChangeEvent>
 ) {
     if cursor_moved_events.len() == 0 {
         return;
@@ -80,6 +108,7 @@ pub fn update_cursor_position(
     let window = windows.single();
     let width = window.resolution.width();
     let height = window.resolution.height();
+    events.send(CursorPositionChangeEvent);
 
     for event in cursor_moved_events.iter() {
         position.x = event.position.x;
@@ -106,4 +135,29 @@ pub fn update_cursor_position(
             position.on_up_edge = false;
         }
     }
+}
+
+pub fn update_cursor_position(
+    events: EventReader<CursorPositionChangeEvent>,
+    cursor_relative_position: Res<CursorRelativePosition>,
+    camera_position: Query<(&GlobalTransform, &Camera), With<Camera>>,
+    mut cursor_position_text: Query<&mut Text, With<CursorPositionText>>,
+    mut cursor_position: ResMut<CursorPosition>
+) {
+    if events.len() == 0 {
+        return;
+    }
+    let (global, camera) = camera_position.single();
+    let Some(position) = camera.viewport_to_world_2d(
+        global,
+        Vec2::new(cursor_relative_position.x, cursor_relative_position.y)
+    ) else {
+        println!("viewport_to_world_2d: none");
+        return;
+    };
+
+    let mut text = cursor_position_text.single_mut();
+    let text = &mut text.sections[0].value;
+    *text = format!("Cursor Position: x: {} y: {}", position.x, position.y,);
+    cursor_position.0 = position;
 }

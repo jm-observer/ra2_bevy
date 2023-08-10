@@ -1,9 +1,8 @@
+use crate::cursor_keyboard_camera::CursorPositionChangeEvent;
 use bevy::prelude::*;
 
-#[derive(Default)]
+#[derive(Default, Event)]
 pub struct CameraPositionChangeEvent(pub f32, pub f32, pub f32);
-
-impl Event for CameraPositionChangeEvent {}
 
 #[derive(Component)]
 pub struct Camera;
@@ -13,7 +12,8 @@ pub struct CameraPositionText;
 pub fn update_camera_position(
     mut events: EventReader<CameraPositionChangeEvent>,
     mut camera_position: Query<&mut Transform, With<Camera>>,
-    mut camera_position_text: Query<&mut Text, With<CameraPositionText>>
+    mut camera_position_text: Query<&mut Text, With<CameraPositionText>>,
+    mut cursor_events: EventWriter<CursorPositionChangeEvent>
 ) {
     if events.len() == 0 {
         return;
@@ -31,4 +31,6 @@ pub fn update_camera_position(
         "Camera Positon x: {} y: {} z: {}",
         camera_position.translation.x, camera_position.translation.y, camera_position.translation.z
     );
+
+    cursor_events.send(CursorPositionChangeEvent);
 }

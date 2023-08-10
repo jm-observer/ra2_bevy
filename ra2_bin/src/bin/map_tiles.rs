@@ -1,15 +1,12 @@
 //! A simple 3D scene with light shining over a cube sitting on a plane.
 
-use bevy::{asset::LoadState, prelude::*};
+use bevy::{asset::LoadState, prelude::*, window::WindowMode};
 use ra2_asset::{
     asset::{IniAsset, MapAsset, PaletteAsset, TileAsset, TileTexture},
     loader::{IniFileAssetLoader, MapLoader, PaletteLoader, TilesAssetLoader}
 };
 use ra2_bin::mp02t2_lighting;
-use ra2_data::{
-    color::{IsoPalettes, Palette},
-    rule::GeneralRules
-};
+use ra2_data::{color::IsoPalettes, rule::GeneralRules};
 use ra2_plugins::cursor_keyboard_camera::CameraChangePlugin;
 use ra2_render::{
     data::map::{MapTileCollection, TileCollection},
@@ -20,7 +17,16 @@ use std::{collections::HashMap, env, sync::Arc};
 fn main() {
     env::set_var("BEVY_ASSET_ROOT", "D:\\git");
     App::new()
-        .add_plugins((DefaultPlugins, CameraChangePlugin))
+        .add_plugins((
+            DefaultPlugins.set(WindowPlugin {
+                primary_window: Some(Window {
+                    mode: WindowMode::BorderlessFullscreen,
+                    ..default()
+                }),
+                ..default()
+            }),
+            CameraChangePlugin
+        ))
         .add_asset::<MapAsset>()
         .add_asset::<PaletteAsset>()
         .add_asset::<TileAsset>()
@@ -53,9 +59,6 @@ fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         temperate_ini,
         printed: false
     });
-    // let mut orb = Camera2dBundle::default();
-    // orb.transform = Transform::from_xyz(2500.0, -1200.0, 999.9);
-    // commands.spawn(orb);
 }
 
 fn print_on_load(
