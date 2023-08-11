@@ -14,7 +14,7 @@ pub struct CursorRelativePosition {
 
 /// 鼠标的坐标
 #[derive(Debug, Resource, Default)]
-pub struct CursorPosition(Vec2);
+pub struct CursorPosition(pub Vec2);
 
 #[derive(Default, Event)]
 pub struct CursorPositionChangeEvent;

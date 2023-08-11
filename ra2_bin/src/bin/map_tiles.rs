@@ -6,11 +6,15 @@ use ra2_asset::{
     loader::{IniFileAssetLoader, MapLoader, PaletteLoader, TilesAssetLoader}
 };
 use ra2_bin::mp02t2_lighting;
-use ra2_data::{color::IsoPalettes, rule::GeneralRules};
-use ra2_plugins::cursor_keyboard_camera::CameraChangePlugin;
+use ra2_data::{
+    color::IsoPalettes,
+    coord::{ISO_TILE_HEIGHT, ISO_TILE_SIZE},
+    rule::GeneralRules
+};
+use ra2_plugins::cursor_keyboard_camera::{CameraChangePlugin, CursorPosition};
 use ra2_render::{
-    data::map::{MapTileCollection, TileCollection},
-    system::map::create_map_tile_sprites
+    data::map::{MapTileCollection, MapTileUnitComponent, TileCollection},
+    system::map::{create_map_tile_sprites, TilePostion}
 };
 use std::{collections::HashMap, env, sync::Arc};
 
@@ -37,6 +41,9 @@ fn main() {
         .add_asset_loader(IniFileAssetLoader)
         .add_systems(Startup, setup)
         .add_systems(Update, print_on_load)
+        .add_systems(Update, update_by_mouse_event)
+        .add_systems(Update, update_unselecting_transform)
+        .add_systems(Update, update_selecting_transform)
         .run();
 }
 
@@ -59,6 +66,8 @@ fn setup(mut commands: Commands, asset_server: ResMut<AssetServer>) {
         temperate_ini,
         printed: false
     });
+
+    commands.insert_resource(SelectInfo::default());
 }
 
 fn print_on_load(
@@ -139,4 +148,96 @@ pub struct CustomRes {
     pub map:           Handle<MapAsset>,
     pub tiles:         Vec<HandleUntyped>,
     pub printed:       bool
+}
+
+#[derive(Resource, Default)]
+pub struct SelectInfo {
+    pub left_pressed: bool
+}
+
+#[derive(Component)]
+pub struct TileSelected;
+#[derive(Component)]
+pub struct TileSelecting;
+#[derive(Component)]
+pub struct TileUnSelecting;
+
+pub fn update_by_mouse_event(
+    tiles: Query<(&Transform, &MapTileUnitComponent, &TilePostion, Entity)>,
+    tile_selected: Query<Entity, With<TileSelected>>,
+    mut commands: Commands,
+    mouse_button_input: Res<Input<MouseButton>>,
+    cursor_position: Res<CursorPosition>,
+    mut select_info: ResMut<SelectInfo>
+) {
+    if !mouse_button_input.pressed(MouseButton::Left) {
+        select_info.left_pressed = false;
+        return;
+    }
+    if select_info.left_pressed == true {
+        // 已经计算过了，就不再计算了
+        return;
+    }
+    select_info.left_pressed = true;
+    let transform = cursor_position.0.clone();
+    if let Some((tile, positon, entity)) = find_tile_in_region(
+        &transform,
+        ISO_TILE_SIZE as f32,
+        ISO_TILE_HEIGHT as f32,
+        tiles
+    ) {
+        for entity in tile_selected.iter() {
+            commands
+                .entity(entity)
+                .remove::<TileSelected>()
+                .insert(TileUnSelecting);
+        }
+        info!("select {:?}, {:?}", positon.0, tile.0);
+        commands.entity(entity).insert(TileSelecting);
+    }
+}
+
+pub fn update_unselecting_transform(
+    mut tile_selected: Query<(&mut Transform, Entity), With<TileUnSelecting>>,
+    mut commands: Commands
+) {
+    for (mut transform, entity) in tile_selected.iter_mut() {
+        transform.translation.y = transform.translation.y - 20.0;
+        commands.entity(entity).remove::<TileUnSelecting>();
+    }
+}
+
+pub fn update_selecting_transform(
+    mut tile_selected: Query<(&mut Transform, Entity), With<TileSelecting>>,
+    mut commands: Commands
+) {
+    for (mut transform, entity) in tile_selected.iter_mut() {
+        transform.translation.y = transform.translation.y + 20.0;
+        commands
+            .entity(entity)
+            .remove::<TileSelecting>()
+            .insert(TileSelected);
+    }
+}
+
+fn find_tile_in_region(
+    point: &Vec2,
+    half_width: f32,
+    half_heigth: f32,
+    tiles: Query<(&Transform, &MapTileUnitComponent, &TilePostion, Entity)>
+) -> Option<(MapTileUnitComponent, TilePostion, Entity)> {
+    let max_x = point.x + half_width;
+    let min_x = point.x - half_width;
+    let max_y = point.y + half_heigth;
+    let min_y = point.y - half_heigth;
+    for (tran, mtuc, position, entity) in tiles.iter() {
+        if tran.translation.x >= min_x
+            && tran.translation.x <= max_x
+            && tran.translation.y >= min_y
+            && tran.translation.y <= max_y
+        {
+            return Some((mtuc.clone(), position.clone(), entity));
+        }
+    }
+    None
 }

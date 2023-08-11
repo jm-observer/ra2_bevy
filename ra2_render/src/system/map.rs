@@ -6,6 +6,9 @@ use crate::{
 use bevy::prelude::*;
 use std::sync::Arc;
 
+#[derive(Clone, Component)]
+pub struct TilePostion(pub Vec3);
+
 /// 渲染地图
 pub fn playtime_enter_map_draw(
     // tcr: Option<Res<TileCollectionRes>>, rr: Option<Res<RuleRes>>, mr: Option<Res<MapRes>>,
@@ -54,7 +57,8 @@ pub fn create_map_tile_sprites(command: &mut Commands, tiles: Arc<MapTileCollect
                 0.0
             ))
             .insert(TileComponent)
-            .insert(arc_map_tile_units.clone());
+            .insert(arc_map_tile_units.clone())
+            .insert(TilePostion(Vec3::new(x_c, y_c * 1.0, 0.0)));
         if let Some(_anim) = n.get_animation() {}
     }
 }
