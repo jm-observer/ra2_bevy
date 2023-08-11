@@ -7,7 +7,14 @@ resolver = "2" # Important! wgpu/Bevy needs this!
 [profile.dev]
 opt-level = 1
 
+
+
 # Enable high optimizations for dependencies (incl. Bevy), but not for our code:
 [profile.dev.package."*"]
 opt-level = 3
+
+
+[workspace.dependencies]
+bevy = { version = "0.11.0" , features = ["dynamic_linking"] }
+anyhow = "1.0.71"
 

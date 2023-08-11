@@ -9,9 +9,10 @@ edition = "2021"
 ra2_asset = {path = "../ra2_asset"}
 ra2_data = { path = "../ra2_data"}
 ra2_util = { path = "../ra2_util"}
-anyhow = "1.0.71"
+anyhow.workspace = true
 
-bevy = { git = "https://github.com/bevyengine/bevy.git" , features = ["dynamic_linking"] }
+bevy.workspace = true
+
 #enum：通过i32来获取enum
 num = "0.4"
 num-derive = "0.3"

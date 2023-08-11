@@ -11,5 +11,5 @@ ra2_data = { path = "../ra2_data"}
 ra2_render = { path = "../ra2_render"}
 ra2_plugins = { path = "../ra2_plugins"}
 
-anyhow = "1.0.71"
-bevy = { git = "https://github.com/bevyengine/bevy.git" , features = ["dynamic_linking"] }
+anyhow.workspace = true
+bevy.workspace = true
